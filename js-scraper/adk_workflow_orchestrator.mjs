@@ -318,7 +318,7 @@ class IrisWorkflowOrchestrator {
         }
 
         // Execute the workflow
-        const result = await this.workflow.run({
+        const result = await this.workflow.execute({
           input: {
             timestamp: new Date().toISOString(),
             sessionId: this.sessionId,
@@ -362,9 +362,8 @@ class IrisWorkflowOrchestrator {
       // Step 1: Market Data Fetching
       console.log('📊 Step 1: Fetching market data...');
       try {
-        const marketResult = await this.agents.marketDataFetcher.run({
-          input: { mode: 'test', maxTokens: 10 }
-        });
+        const marketTool = new MarketDataTool(this.supabase);
+        const marketResult = await marketTool.execute({ mode: 'test', maxTokens: 10 });
         results.marketData = marketResult;
         console.log('✅ Market data fetching completed');
       } catch (error) {
@@ -375,9 +374,8 @@ class IrisWorkflowOrchestrator {
       // Step 2: TikTok Scraping
       console.log('🎬 Step 2: Scraping TikTok content...');
       try {
-        const tiktokResult = await this.agents.tiktokScraper.run({
-          input: { mode: 'test', maxVideos: 5 }
-        });
+        const tiktokTool = new TikTokScrapingTool(this.supabase);
+        const tiktokResult = await tiktokTool.execute({ mode: 'test', maxVideos: 5 });
         results.tiktok = tiktokResult;
         console.log('✅ TikTok scraping completed');
       } catch (error) {
@@ -388,9 +386,8 @@ class IrisWorkflowOrchestrator {
       // Step 3: Telegram Scraping
       console.log('📡 Step 3: Scraping Telegram channels...');
       try {
-        const telegramResult = await this.agents.telegramScraper.run({
-          input: { mode: 'test', maxChannels: 2 }
-        });
+        const telegramTool = new TelegramScrapingTool(this.supabase);
+        const telegramResult = await telegramTool.execute({ mode: 'test', maxChannels: 2 });
         results.telegram = telegramResult;
         console.log('✅ Telegram scraping completed');
       } catch (error) {
@@ -401,9 +398,8 @@ class IrisWorkflowOrchestrator {
       // Step 4: Outlight Scraping
       console.log('🔍 Step 4: Discovering channels from Outlight.fun...');
       try {
-        const outlightResult = await this.agents.outlightScraper.run({
-          input: { mode: 'test', maxChannels: 2 }
-        });
+        const outlightTool = new OutlightScrapingTool(this.supabase);
+        const outlightResult = await outlightTool.execute({ mode: 'test', maxChannels: 2 });
         results.outlight = outlightResult;
         console.log('✅ Outlight scraping completed');
       } catch (error) {
@@ -414,9 +410,8 @@ class IrisWorkflowOrchestrator {
       // Step 5: Pattern Analysis
       console.log('🧠 Step 5: Analyzing patterns...');
       try {
-        const patternResult = await this.agents.patternAnalyzer.run({
-          input: { mode: 'test', analysisType: 'quick' }
-        });
+        const patternTool = new PatternAnalysisTool(this.supabase);
+        const patternResult = await patternTool.execute({ mode: 'test', analysisType: 'quick' });
         results.patternAnalysis = patternResult;
         console.log('✅ Pattern analysis completed');
       } catch (error) {
@@ -427,9 +422,8 @@ class IrisWorkflowOrchestrator {
       // Step 6: Twitter Alerts
       console.log('🐦 Step 6: Generating Twitter alerts...');
       try {
-        const twitterResult = await this.agents.twitterAlerts.run({
-          input: { mode: 'test', dryRun: true }
-        });
+        const twitterTool = new TwitterAPITool();
+        const twitterResult = await twitterTool.execute({ mode: 'test', dryRun: true });
         results.twitter = twitterResult;
         console.log('✅ Twitter alerts completed');
       } catch (error) {
@@ -440,9 +434,8 @@ class IrisWorkflowOrchestrator {
       // Step 7: Dashboard Updates
       console.log('📱 Step 7: Updating dashboard...');
       try {
-        const dashboardResult = await this.agents.dashboardUpdater.run({
-          input: { mode: 'test', updateType: 'status' }
-        });
+        const dashboardTool = new DashboardSyncTool(this.supabase);
+        const dashboardResult = await dashboardTool.execute({ mode: 'test', updateType: 'status' });
         results.dashboard = dashboardResult;
         console.log('✅ Dashboard updates completed');
       } catch (error) {
@@ -500,7 +493,7 @@ class IrisWorkflowOrchestrator {
           ])
           .build();
 
-        const result = await analysisWorkflow.run({
+        const result = await analysisWorkflow.execute({
           input: {
             timestamp: new Date().toISOString(),
             mode: 'periodic_analysis'
@@ -516,9 +509,8 @@ class IrisWorkflowOrchestrator {
         const results = {};
         
         try {
-          const outlightResult = await this.agents.outlightScraper.run({
-            input: { mode: 'periodic', maxChannels: 5 }
-          });
+          const outlightTool = new OutlightScrapingTool(this.supabase);
+          const outlightResult = await outlightTool.execute({ mode: 'periodic', maxChannels: 5 });
           results.outlight = outlightResult;
           console.log('✅ Outlight discovery completed');
         } catch (error) {
@@ -527,9 +519,8 @@ class IrisWorkflowOrchestrator {
         }
 
         try {
-          const patternResult = await this.agents.patternAnalyzer.run({
-            input: { mode: 'periodic', analysisType: 'quick' }
-          });
+          const patternTool = new PatternAnalysisTool(this.supabase);
+          const patternResult = await patternTool.execute({ mode: 'periodic', analysisType: 'quick' });
           results.patternAnalysis = patternResult;
           console.log('✅ Pattern analysis completed');
         } catch (error) {
@@ -538,9 +529,8 @@ class IrisWorkflowOrchestrator {
         }
 
         try {
-          const twitterResult = await this.agents.twitterAlerts.run({
-            input: { mode: 'periodic', dryRun: false }
-          });
+          const twitterTool = new TwitterAPITool();
+          const twitterResult = await twitterTool.execute({ mode: 'periodic', dryRun: false });
           results.twitter = twitterResult;
           console.log('✅ Twitter alerts completed');
         } catch (error) {
@@ -549,9 +539,8 @@ class IrisWorkflowOrchestrator {
         }
 
         try {
-          const dashboardResult = await this.agents.dashboardUpdater.run({
-            input: { mode: 'periodic', updateType: 'full' }
-          });
+          const dashboardTool = new DashboardSyncTool(this.supabase);
+          const dashboardResult = await dashboardTool.execute({ mode: 'periodic', updateType: 'full' });
           results.dashboard = dashboardResult;
           console.log('✅ Dashboard updates completed');
         } catch (error) {
