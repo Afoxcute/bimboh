@@ -189,14 +189,6 @@ class IrisWorkflowOrchestrator {
       });
 
       console.log('✅ All ADK agents initialized successfully');
-      
-      // Debug: Check agent methods
-      console.log('🔍 Agent debugging:');
-      Object.keys(this.agents).forEach(agentName => {
-        const agent = this.agents[agentName];
-        console.log(`  ${agentName}:`, Object.getOwnPropertyNames(agent));
-        console.log(`  ${agentName} prototype:`, Object.getOwnPropertyNames(Object.getPrototypeOf(agent)));
-      });
     } catch (error) {
       console.error('❌ Error initializing agents:', error);
       throw error;
@@ -210,37 +202,21 @@ class IrisWorkflowOrchestrator {
     try {
       console.log('🔄 Creating ADK-TS workflow...');
 
-      // For now, skip ADK workflow creation and use manual execution
-      // This avoids API compatibility issues while maintaining all functionality
-      console.log('🔄 Using manual workflow execution (ADK integration pending)');
-      this.workflow = null; // Set to null to indicate manual mode
-      return null;
-      
-      // TODO: Re-enable ADK workflow once API compatibility is confirmed
-      /*
-      try {
-        this.workflow = await AgentBuilder.create('iris_memecoin_pipeline')
-          .asSequential([
-            this.agents.marketDataFetcher,    // Step 1: Fetch latest market data
-            this.agents.tiktokScraper,        // Step 2: Scrape TikTok content
-            this.agents.telegramScraper,      // Step 3: Scrape existing Telegram channels
-            this.agents.outlightScraper,      // Step 4: Discover new channels from Outlight.fun
-            this.agents.patternAnalyzer,      // Step 5: Analyze patterns and correlations
-            this.agents.twitterAlerts,        // Step 6: Generate and post alerts
-            this.agents.dashboardUpdater      // Step 7: Update frontend dashboard
-          ])
-          .build();
+      this.workflow = await AgentBuilder.create('iris_memecoin_pipeline')
+        .asSequential([
+          this.agents.marketDataFetcher,    // Step 1: Fetch latest market data
+          this.agents.tiktokScraper,        // Step 2: Scrape TikTok content
+          this.agents.telegramScraper,      // Step 3: Scrape existing Telegram channels
+          this.agents.outlightScraper,      // Step 4: Discover new channels from Outlight.fun
+          this.agents.patternAnalyzer,      // Step 5: Analyze patterns and correlations
+          this.agents.twitterAlerts,        // Step 6: Generate and post alerts
+          this.agents.dashboardUpdater      // Step 7: Update frontend dashboard
+        ])
+        .withSessionService(this.createSessionService(), this.sessionId, 'iris_workflow')
+        .build();
 
-        console.log('✅ ADK workflow created successfully');
-        console.log('🔍 Workflow object methods:', Object.getOwnPropertyNames(this.workflow));
-        console.log('🔍 Workflow prototype methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(this.workflow)));
-        return this.workflow;
-      } catch (adkError) {
-        console.warn('⚠️ ADK workflow creation failed, falling back to manual execution:', adkError.message);
-        this.workflow = null; // Set to null to indicate fallback mode
-        return null;
-      }
-      */
+      console.log('✅ ADK workflow created successfully');
+      return this.workflow;
     } catch (error) {
       console.error('❌ Error creating workflow:', error);
       throw error;
@@ -252,77 +228,25 @@ class IrisWorkflowOrchestrator {
    */
   createSessionService() {
     return {
-      async createSession(sessionId, initialData = {}) {
-        try {
-          const { data, error } = await this.supabase
-            .from('workflow_sessions')
-            .upsert({
-              session_id: sessionId,
-              session_data: initialData,
-              status: 'active',
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            })
-            .select()
-            .single();
-          
-          if (error) throw error;
-          return data;
-        } catch (error) {
-          console.error('Error creating session:', error);
-          return null;
-        }
-      },
-
       async getSession(sessionId) {
-        try {
-          const { data, error } = await this.supabase
-            .from('workflow_sessions')
-            .select('*')
-            .eq('session_id', sessionId)
-            .single();
-          
-          if (error && error.code !== 'PGRST116') throw error;
-          return data?.session_data || {};
-        } catch (error) {
-          console.error('Error getting session:', error);
-          return {};
-        }
+        // Implement session retrieval from database
+        const { data } = await this.supabase
+          .from('workflow_sessions')
+          .select('*')
+          .eq('session_id', sessionId)
+          .single();
+        return data?.session_data || {};
       },
       
       async saveSession(sessionId, sessionData) {
-        try {
-          const { data, error } = await this.supabase
-            .from('workflow_sessions')
-            .upsert({
-              session_id: sessionId,
-              session_data: sessionData,
-              updated_at: new Date().toISOString()
-            })
-            .select()
-            .single();
-          
-          if (error) throw error;
-          return data;
-        } catch (error) {
-          console.error('Error saving session:', error);
-          return null;
-        }
-      },
-
-      async deleteSession(sessionId) {
-        try {
-          const { error } = await this.supabase
-            .from('workflow_sessions')
-            .delete()
-            .eq('session_id', sessionId);
-          
-          if (error) throw error;
-          return true;
-        } catch (error) {
-          console.error('Error deleting session:', error);
-          return false;
-        }
+        // Implement session storage to database
+        await this.supabase
+          .from('workflow_sessions')
+          .upsert({
+            session_id: sessionId,
+            session_data: sessionData,
+            updated_at: new Date().toISOString()
+          });
       }
     };
   }
@@ -345,174 +269,27 @@ class IrisWorkflowOrchestrator {
       }
 
       // Execute the workflow
-      if (this.workflow) {
-        // Use ADK workflow - try different execution methods
-        try {
-          let result;
-          
-          // Try different ADK execution methods
-          if (typeof this.workflow.run === 'function') {
-            result = await this.workflow.run({
-              input: {
-                timestamp: new Date().toISOString(),
-                sessionId: this.sessionId,
-                mode: 'full_analysis'
-              },
-              context: {
-                environment: process.env.NODE_ENV || 'development',
-                version: '1.0.0',
-                features: ['tiktok_scraping', 'telegram_monitoring', 'pattern_analysis', 'twitter_alerts']
-              }
-            });
-          } else if (typeof this.workflow.execute === 'function') {
-            result = await this.workflow.execute({
-              input: {
-                timestamp: new Date().toISOString(),
-                sessionId: this.sessionId,
-                mode: 'full_analysis'
-              }
-            });
-          } else if (typeof this.workflow.start === 'function') {
-            result = await this.workflow.start({
-              input: {
-                timestamp: new Date().toISOString(),
-                sessionId: this.sessionId,
-                mode: 'full_analysis'
-              }
-            });
-          } else {
-            throw new Error('ADK workflow object does not have run, execute, or start method');
-          }
-
-          this.isRunning = true;
-          console.log('✅ ADK Workflow execution completed successfully');
-          console.log('📊 Workflow Results:', result);
-          return result;
-        } catch (adkExecutionError) {
-          console.warn('⚠️ ADK workflow execution failed, falling back to manual execution:', adkExecutionError.message);
-          // Fall through to manual execution
+      const result = await this.workflow.run({
+        input: {
+          timestamp: new Date().toISOString(),
+          sessionId: this.sessionId,
+          mode: 'full_analysis'
+        },
+        context: {
+          environment: process.env.NODE_ENV || 'development',
+          version: '1.0.0',
+          features: ['tiktok_scraping', 'telegram_monitoring', 'pattern_analysis', 'twitter_alerts']
         }
-      }
-      
-      // Manual execution (either no workflow or ADK execution failed)
-      if (true) {
-        // Fallback to manual execution
-        console.log('🔄 Running manual workflow execution...');
-        const result = await this.runManualWorkflow();
-        
-        this.isRunning = true;
-        console.log('✅ Manual workflow execution completed successfully');
-        console.log('📊 Workflow Results:', result);
-        return result;
-      }
+      });
+
+      this.isRunning = true;
+      console.log('✅ Workflow execution completed successfully');
+      console.log('📊 Workflow Results:', result);
+
+      return result;
     } catch (error) {
       console.error('❌ Workflow execution failed:', error);
       throw error;
-    }
-  }
-
-  /**
-   * Manual workflow execution (fallback when ADK workflow fails)
-   */
-  async runManualWorkflow() {
-    const results = {};
-    
-    try {
-      // Step 1: Market Data Fetching
-      console.log('📊 Step 1: Fetching market data...');
-      results.marketData = await this.executeAgent(this.agents.marketDataFetcher, {
-        input: { mode: 'full_collection' }
-      });
-
-      // Step 2: TikTok Scraping
-      console.log('🎬 Step 2: Scraping TikTok content...');
-      results.tiktokScraping = await this.executeAgent(this.agents.tiktokScraper, {
-        input: { mode: 'full_scraping', maxVideos: 100 }
-      });
-
-      // Step 3: Telegram Scraping
-      console.log('📡 Step 3: Scraping Telegram channels...');
-      results.telegramScraping = await this.executeAgent(this.agents.telegramScraper, {
-        input: { mode: 'full_scraping', maxChannels: 10 }
-      });
-
-      // Step 4: Outlight Scraping
-      console.log('🔍 Step 4: Discovering channels from Outlight.fun...');
-      results.outlightScraping = await this.executeAgent(this.agents.outlightScraper, {
-        input: { mode: 'full_discovery' }
-      });
-
-      // Step 5: Pattern Analysis
-      console.log('🧠 Step 5: Analyzing patterns and correlations...');
-      results.patternAnalysis = await this.executeAgent(this.agents.patternAnalyzer, {
-        input: { mode: 'comprehensive_analysis' }
-      });
-
-      // Step 6: Twitter Alerts
-      console.log('🐦 Step 6: Generating and posting alerts...');
-      results.twitterAlerts = await this.executeAgent(this.agents.twitterAlerts, {
-        input: { mode: 'alert_generation' }
-      });
-
-      // Step 7: Dashboard Updates
-      console.log('📱 Step 7: Updating frontend dashboard...');
-      results.dashboardUpdate = await this.executeAgent(this.agents.dashboardUpdater, {
-        input: { mode: 'full_update' }
-      });
-
-      return {
-        success: true,
-        mode: 'manual',
-        results,
-        timestamp: new Date().toISOString()
-      };
-    } catch (error) {
-      console.error('❌ Manual workflow execution failed:', error);
-      return {
-        success: false,
-        mode: 'manual',
-        error: error.message,
-        results,
-        timestamp: new Date().toISOString()
-      };
-    }
-  }
-
-  /**
-   * Execute an agent with proper method detection
-   */
-  async executeAgent(agent, input) {
-    try {
-      // Try different execution methods
-      if (typeof agent.run === 'function') {
-        return await agent.run(input);
-      } else if (typeof agent.execute === 'function') {
-        return await agent.execute(input);
-      } else if (typeof agent.start === 'function') {
-        return await agent.start(input);
-      } else if (typeof agent.process === 'function') {
-        return await agent.process(input);
-      } else if (typeof agent.invoke === 'function') {
-        return await agent.invoke(input);
-      } else {
-        // If no standard method found, try to execute tools directly
-        console.log(`🔍 Agent ${agent.name || 'unknown'} methods:`, Object.getOwnPropertyNames(agent));
-        console.log(`🔍 Agent prototype methods:`, Object.getOwnPropertyNames(Object.getPrototypeOf(agent)));
-        
-        // For now, return a mock result to continue the workflow
-        return {
-          success: true,
-          message: `Agent ${agent.name || 'unknown'} executed (method not found)`,
-          input: input
-        };
-      }
-    } catch (error) {
-      console.error(`❌ Error executing agent ${agent.name || 'unknown'}:`, error);
-      return {
-        success: false,
-        error: error.message,
-        input: input
-      };
     }
   }
 
@@ -538,34 +315,25 @@ class IrisWorkflowOrchestrator {
       
       console.log('🔄 Running periodic analysis...');
       
-      // Use manual periodic analysis (ADK integration pending)
-      console.log('🔄 Running manual periodic analysis...');
-      
-      const results = {};
-      
-      results.outlightScraping = await this.executeAgent(this.agents.outlightScraper, {
-        input: { mode: 'periodic_discovery' }
-      });
-      
-      results.patternAnalysis = await this.executeAgent(this.agents.patternAnalyzer, {
-        input: { mode: 'quick_analysis' }
-      });
-      
-      results.twitterAlerts = await this.executeAgent(this.agents.twitterAlerts, {
-        input: { mode: 'periodic_alerts' }
-      });
-      
-      results.dashboardUpdate = await this.executeAgent(this.agents.dashboardUpdater, {
-        input: { mode: 'periodic_update' }
+      // Run just the analysis components
+      const analysisWorkflow = await AgentBuilder.create('periodic_analysis')
+        .asSequential([
+          this.agents.outlightScraper,      // Discover new channels periodically
+          this.agents.patternAnalyzer,
+          this.agents.twitterAlerts,
+          this.agents.dashboardUpdater
+        ])
+        .build();
+
+      const result = await analysisWorkflow.run({
+        input: {
+          timestamp: new Date().toISOString(),
+          mode: 'periodic_analysis'
+        }
       });
 
-      console.log('✅ Periodic analysis completed (manual)');
-      return {
-        success: true,
-        mode: 'manual',
-        results,
-        timestamp: new Date().toISOString()
-      };
+      console.log('✅ Periodic analysis completed');
+      return result;
     } catch (error) {
       console.error('❌ Periodic analysis failed:', error);
     }

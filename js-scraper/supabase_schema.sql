@@ -546,7 +546,7 @@ $$ language 'plpgsql';
 
 -- Log schema creation
 INSERT INTO performance_metrics (metric_name, metric_value, metric_unit, metadata) 
-VALUES ('schema_created', 1, 'version', '{"version": "1.0.0", "created_at": "2024-01-01T00:00:00Z"}'::jsonb);
+VALUES ('schema_created', 1, 'version', jsonb_build_object('version', '1.0.0', 'created_at', NOW()));
 
 -- =====================================================
 -- END OF SCHEMA
