@@ -26,7 +26,8 @@
     "scrape-outlight": "node run-outlight-scraper.mjs",
     "test-outlight": "node test-outlight-scraper.mjs",
     "adk-workflow": "node adk_workflow_orchestrator.mjs",
-    "adk-test": "node test_adk_workflow.mjs"
+    "adk-test": "node test_adk_workflow.mjs",
+    "migrate-telegram": "node migrate_telegram_timestamps.mjs"
   },
   "dependencies": {
     "@iqai/adk": "^0.3.6",
