@@ -202,7 +202,14 @@ class IrisWorkflowOrchestrator {
     try {
       console.log('🔄 Creating ADK-TS workflow...');
 
-      // Try to create workflow with ADK-TS
+      // For now, skip ADK workflow creation and use manual execution
+      // This avoids API compatibility issues while maintaining all functionality
+      console.log('🔄 Using manual workflow execution (ADK integration pending)');
+      this.workflow = null; // Set to null to indicate manual mode
+      return null;
+      
+      // TODO: Re-enable ADK workflow once API compatibility is confirmed
+      /*
       try {
         this.workflow = await AgentBuilder.create('iris_memecoin_pipeline')
           .asSequential([
@@ -217,12 +224,15 @@ class IrisWorkflowOrchestrator {
           .build();
 
         console.log('✅ ADK workflow created successfully');
+        console.log('🔍 Workflow object methods:', Object.getOwnPropertyNames(this.workflow));
+        console.log('🔍 Workflow prototype methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(this.workflow)));
         return this.workflow;
       } catch (adkError) {
         console.warn('⚠️ ADK workflow creation failed, falling back to manual execution:', adkError.message);
         this.workflow = null; // Set to null to indicate fallback mode
         return null;
       }
+      */
     } catch (error) {
       console.error('❌ Error creating workflow:', error);
       throw error;
@@ -328,25 +338,56 @@ class IrisWorkflowOrchestrator {
 
       // Execute the workflow
       if (this.workflow) {
-        // Use ADK workflow
-        const result = await this.workflow.run({
-          input: {
-            timestamp: new Date().toISOString(),
-            sessionId: this.sessionId,
-            mode: 'full_analysis'
-          },
-          context: {
-            environment: process.env.NODE_ENV || 'development',
-            version: '1.0.0',
-            features: ['tiktok_scraping', 'telegram_monitoring', 'pattern_analysis', 'twitter_alerts']
+        // Use ADK workflow - try different execution methods
+        try {
+          let result;
+          
+          // Try different ADK execution methods
+          if (typeof this.workflow.run === 'function') {
+            result = await this.workflow.run({
+              input: {
+                timestamp: new Date().toISOString(),
+                sessionId: this.sessionId,
+                mode: 'full_analysis'
+              },
+              context: {
+                environment: process.env.NODE_ENV || 'development',
+                version: '1.0.0',
+                features: ['tiktok_scraping', 'telegram_monitoring', 'pattern_analysis', 'twitter_alerts']
+              }
+            });
+          } else if (typeof this.workflow.execute === 'function') {
+            result = await this.workflow.execute({
+              input: {
+                timestamp: new Date().toISOString(),
+                sessionId: this.sessionId,
+                mode: 'full_analysis'
+              }
+            });
+          } else if (typeof this.workflow.start === 'function') {
+            result = await this.workflow.start({
+              input: {
+                timestamp: new Date().toISOString(),
+                sessionId: this.sessionId,
+                mode: 'full_analysis'
+              }
+            });
+          } else {
+            throw new Error('ADK workflow object does not have run, execute, or start method');
           }
-        });
 
-        this.isRunning = true;
-        console.log('✅ ADK Workflow execution completed successfully');
-        console.log('📊 Workflow Results:', result);
-        return result;
-      } else {
+          this.isRunning = true;
+          console.log('✅ ADK Workflow execution completed successfully');
+          console.log('📊 Workflow Results:', result);
+          return result;
+        } catch (adkExecutionError) {
+          console.warn('⚠️ ADK workflow execution failed, falling back to manual execution:', adkExecutionError.message);
+          // Fall through to manual execution
+        }
+      }
+      
+      // Manual execution (either no workflow or ADK execution failed)
+      if (true) {
         // Fallback to manual execution
         console.log('🔄 Running manual workflow execution...');
         const result = await this.runManualWorkflow();
@@ -451,56 +492,34 @@ class IrisWorkflowOrchestrator {
       
       console.log('🔄 Running periodic analysis...');
       
-      // Try to create analysis workflow with ADK
-      try {
-        const analysisWorkflow = await AgentBuilder.create('periodic_analysis')
-          .asSequential([
-            this.agents.outlightScraper,      // Discover new channels periodically
-            this.agents.patternAnalyzer,
-            this.agents.twitterAlerts,
-            this.agents.dashboardUpdater
-          ])
-          .build();
+      // Use manual periodic analysis (ADK integration pending)
+      console.log('🔄 Running manual periodic analysis...');
+      
+      const results = {};
+      
+      results.outlightScraping = await this.agents.outlightScraper.run({
+        input: { mode: 'periodic_discovery' }
+      });
+      
+      results.patternAnalysis = await this.agents.patternAnalyzer.run({
+        input: { mode: 'quick_analysis' }
+      });
+      
+      results.twitterAlerts = await this.agents.twitterAlerts.run({
+        input: { mode: 'periodic_alerts' }
+      });
+      
+      results.dashboardUpdate = await this.agents.dashboardUpdater.run({
+        input: { mode: 'periodic_update' }
+      });
 
-        const result = await analysisWorkflow.run({
-          input: {
-            timestamp: new Date().toISOString(),
-            mode: 'periodic_analysis'
-          }
-        });
-
-        console.log('✅ Periodic analysis completed (ADK)');
-        return result;
-      } catch (adkError) {
-        console.warn('⚠️ ADK periodic analysis failed, using manual execution:', adkError.message);
-        
-        // Fallback to manual periodic analysis
-        const results = {};
-        
-        results.outlightScraping = await this.agents.outlightScraper.run({
-          input: { mode: 'periodic_discovery' }
-        });
-        
-        results.patternAnalysis = await this.agents.patternAnalyzer.run({
-          input: { mode: 'quick_analysis' }
-        });
-        
-        results.twitterAlerts = await this.agents.twitterAlerts.run({
-          input: { mode: 'periodic_alerts' }
-        });
-        
-        results.dashboardUpdate = await this.agents.dashboardUpdater.run({
-          input: { mode: 'periodic_update' }
-        });
-
-        console.log('✅ Periodic analysis completed (manual)');
-        return {
-          success: true,
-          mode: 'manual',
-          results,
-          timestamp: new Date().toISOString()
-        };
-      }
+      console.log('✅ Periodic analysis completed (manual)');
+      return {
+        success: true,
+        mode: 'manual',
+        results,
+        timestamp: new Date().toISOString()
+      };
     } catch (error) {
       console.error('❌ Periodic analysis failed:', error);
     }
