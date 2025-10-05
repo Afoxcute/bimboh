@@ -95,14 +95,14 @@ CREATE TABLE IF NOT EXISTS telegram_messages (
     channel_title TEXT,
     message_id BIGINT NOT NULL,
     text TEXT,
-    date TIMESTAMP WITH TIME ZONE,
+    date BIGINT,
     author_signature TEXT,
     forward_from_chat_id TEXT,
     forward_from_chat_title TEXT,
     forward_from_message_id BIGINT,
-    forward_date TIMESTAMP WITH TIME ZONE,
+    forward_date BIGINT,
     reply_to_message_id BIGINT,
-    edit_date TIMESTAMP WITH TIME ZONE,
+    edit_date BIGINT,
     media_group_id TEXT,
     has_photo BOOLEAN DEFAULT false,
     has_video BOOLEAN DEFAULT false,
@@ -498,6 +498,48 @@ FROM telegram_messages
 WHERE scraped_at >= NOW() - INTERVAL '30 days'
 GROUP BY DATE(scraped_at)
 ORDER BY date DESC, platform;
+
+-- Alternative query using Unix timestamps for date filtering
+SELECT 
+    DATE(to_timestamp(date)) as message_date,
+    'telegram' as platform,
+    COUNT(*) as total_messages,
+    SUM(views) as total_views,
+    COUNT(*) as total_comments
+FROM telegram_messages
+WHERE date >= EXTRACT(EPOCH FROM (NOW() - INTERVAL '30 days'))::BIGINT
+GROUP BY DATE(to_timestamp(date))
+ORDER BY message_date DESC, platform;
+
+-- =====================================================
+-- HELPER FUNCTIONS
+-- =====================================================
+
+-- Function to convert Unix timestamp to readable date
+CREATE OR REPLACE FUNCTION unix_to_timestamp(unix_time BIGINT)
+RETURNS TIMESTAMP WITH TIME ZONE AS $$
+BEGIN
+    RETURN to_timestamp(unix_time);
+END;
+$$ LANGUAGE plpgsql;
+
+-- Function to get readable date from telegram messages
+CREATE OR REPLACE FUNCTION get_telegram_message_date(message_id BIGINT, channel_id TEXT)
+RETURNS TIMESTAMP WITH TIME ZONE AS $$
+DECLARE
+    unix_date BIGINT;
+BEGIN
+    SELECT date INTO unix_date 
+    FROM telegram_messages 
+    WHERE message_id = $1 AND channel_id = $2;
+    
+    IF unix_date IS NULL THEN
+        RETURN NULL;
+    END IF;
+    
+    RETURN to_timestamp(unix_date);
+END;
+$$ LANGUAGE plpgsql;
 
 -- =====================================================
 -- SAMPLE DATA (Optional)
