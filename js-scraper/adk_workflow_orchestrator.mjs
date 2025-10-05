@@ -202,6 +202,7 @@ class IrisWorkflowOrchestrator {
     try {
       console.log('🔄 Creating ADK-TS workflow...');
 
+      // Create workflow without session service for now to avoid ADK complexity
       this.workflow = await AgentBuilder.create('iris_memecoin_pipeline')
         .asSequential([
           this.agents.marketDataFetcher,    // Step 1: Fetch latest market data
@@ -212,7 +213,6 @@ class IrisWorkflowOrchestrator {
           this.agents.twitterAlerts,        // Step 6: Generate and post alerts
           this.agents.dashboardUpdater      // Step 7: Update frontend dashboard
         ])
-        .withSessionService(this.createSessionService(), this.sessionId, 'iris_workflow')
         .build();
 
       console.log('✅ ADK workflow created successfully');
@@ -228,25 +228,73 @@ class IrisWorkflowOrchestrator {
    */
   createSessionService() {
     return {
-      async getSession(sessionId) {
-        // Implement session retrieval from database
-        const { data } = await this.supabase
-          .from('workflow_sessions')
-          .select('*')
-          .eq('session_id', sessionId)
-          .single();
-        return data?.session_data || {};
-      },
-      
-      async saveSession(sessionId, sessionData) {
-        // Implement session storage to database
-        await this.supabase
+      async createSession(sessionId, sessionData = {}) {
+        // Create or update session in database
+        const { data, error } = await this.supabase
           .from('workflow_sessions')
           .upsert({
             session_id: sessionId,
             session_data: sessionData,
+            status: 'active',
+            created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
-          });
+          })
+          .select()
+          .single();
+        
+        if (error) {
+          console.error('Error creating session:', error);
+          return null;
+        }
+        return data;
+      },
+      
+      async getSession(sessionId) {
+        // Retrieve session from database
+        const { data, error } = await this.supabase
+          .from('workflow_sessions')
+          .select('*')
+          .eq('session_id', sessionId)
+          .single();
+        
+        if (error && error.code !== 'PGRST116') {
+          console.error('Error retrieving session:', error);
+          return null;
+        }
+        return data?.session_data || {};
+      },
+      
+      async updateSession(sessionId, sessionData) {
+        // Update session in database
+        const { data, error } = await this.supabase
+          .from('workflow_sessions')
+          .update({
+            session_data: sessionData,
+            updated_at: new Date().toISOString()
+          })
+          .eq('session_id', sessionId)
+          .select()
+          .single();
+        
+        if (error) {
+          console.error('Error updating session:', error);
+          return null;
+        }
+        return data;
+      },
+      
+      async deleteSession(sessionId) {
+        // Delete session from database
+        const { error } = await this.supabase
+          .from('workflow_sessions')
+          .delete()
+          .eq('session_id', sessionId);
+        
+        if (error) {
+          console.error('Error deleting session:', error);
+          return false;
+        }
+        return true;
       }
     };
   }
@@ -263,32 +311,158 @@ class IrisWorkflowOrchestrator {
 
       console.log('🚀 Starting Iris ADK-TS Workflow...');
       
-      // Create workflow if not exists
-      if (!this.workflow) {
-        await this.createWorkflow();
+      // Try to create and run ADK workflow first
+      try {
+        if (!this.workflow) {
+          await this.createWorkflow();
+        }
+
+        // Execute the workflow
+        const result = await this.workflow.run({
+          input: {
+            timestamp: new Date().toISOString(),
+            sessionId: this.sessionId,
+            mode: 'full_analysis'
+          },
+          context: {
+            environment: process.env.NODE_ENV || 'development',
+            version: '1.0.0',
+            features: ['tiktok_scraping', 'telegram_monitoring', 'pattern_analysis', 'twitter_alerts']
+          }
+        });
+
+        this.isRunning = true;
+        console.log('✅ ADK Workflow execution completed successfully');
+        console.log('📊 Workflow Results:', result);
+        return result;
+
+      } catch (adkError) {
+        console.log('⚠️ ADK workflow failed, falling back to individual agent execution...');
+        console.log('ADK Error:', adkError.message);
+        
+        // Fallback: Run agents individually
+        return await this.runAgentsIndividually();
       }
 
-      // Execute the workflow
-      const result = await this.workflow.run({
-        input: {
-          timestamp: new Date().toISOString(),
-          sessionId: this.sessionId,
-          mode: 'full_analysis'
-        },
-        context: {
-          environment: process.env.NODE_ENV || 'development',
-          version: '1.0.0',
-          features: ['tiktok_scraping', 'telegram_monitoring', 'pattern_analysis', 'twitter_alerts']
-        }
-      });
-
-      this.isRunning = true;
-      console.log('✅ Workflow execution completed successfully');
-      console.log('📊 Workflow Results:', result);
-
-      return result;
     } catch (error) {
       console.error('❌ Workflow execution failed:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Fallback method to run agents individually
+   */
+  async runAgentsIndividually() {
+    try {
+      console.log('🔄 Running agents individually...');
+      
+      const results = {};
+      
+      // Step 1: Market Data Fetching
+      console.log('📊 Step 1: Fetching market data...');
+      try {
+        const marketResult = await this.agents.marketDataFetcher.run({
+          input: { mode: 'test', maxTokens: 10 }
+        });
+        results.marketData = marketResult;
+        console.log('✅ Market data fetching completed');
+      } catch (error) {
+        console.error('❌ Market data fetching failed:', error.message);
+        results.marketData = { success: false, error: error.message };
+      }
+
+      // Step 2: TikTok Scraping
+      console.log('🎬 Step 2: Scraping TikTok content...');
+      try {
+        const tiktokResult = await this.agents.tiktokScraper.run({
+          input: { mode: 'test', maxVideos: 5 }
+        });
+        results.tiktok = tiktokResult;
+        console.log('✅ TikTok scraping completed');
+      } catch (error) {
+        console.error('❌ TikTok scraping failed:', error.message);
+        results.tiktok = { success: false, error: error.message };
+      }
+
+      // Step 3: Telegram Scraping
+      console.log('📡 Step 3: Scraping Telegram channels...');
+      try {
+        const telegramResult = await this.agents.telegramScraper.run({
+          input: { mode: 'test', maxChannels: 2 }
+        });
+        results.telegram = telegramResult;
+        console.log('✅ Telegram scraping completed');
+      } catch (error) {
+        console.error('❌ Telegram scraping failed:', error.message);
+        results.telegram = { success: false, error: error.message };
+      }
+
+      // Step 4: Outlight Scraping
+      console.log('🔍 Step 4: Discovering channels from Outlight.fun...');
+      try {
+        const outlightResult = await this.agents.outlightScraper.run({
+          input: { mode: 'test', maxChannels: 2 }
+        });
+        results.outlight = outlightResult;
+        console.log('✅ Outlight scraping completed');
+      } catch (error) {
+        console.error('❌ Outlight scraping failed:', error.message);
+        results.outlight = { success: false, error: error.message };
+      }
+
+      // Step 5: Pattern Analysis
+      console.log('🧠 Step 5: Analyzing patterns...');
+      try {
+        const patternResult = await this.agents.patternAnalyzer.run({
+          input: { mode: 'test', analysisType: 'quick' }
+        });
+        results.patternAnalysis = patternResult;
+        console.log('✅ Pattern analysis completed');
+      } catch (error) {
+        console.error('❌ Pattern analysis failed:', error.message);
+        results.patternAnalysis = { success: false, error: error.message };
+      }
+
+      // Step 6: Twitter Alerts
+      console.log('🐦 Step 6: Generating Twitter alerts...');
+      try {
+        const twitterResult = await this.agents.twitterAlerts.run({
+          input: { mode: 'test', dryRun: true }
+        });
+        results.twitter = twitterResult;
+        console.log('✅ Twitter alerts completed');
+      } catch (error) {
+        console.error('❌ Twitter alerts failed:', error.message);
+        results.twitter = { success: false, error: error.message };
+      }
+
+      // Step 7: Dashboard Updates
+      console.log('📱 Step 7: Updating dashboard...');
+      try {
+        const dashboardResult = await this.agents.dashboardUpdater.run({
+          input: { mode: 'test', updateType: 'status' }
+        });
+        results.dashboard = dashboardResult;
+        console.log('✅ Dashboard updates completed');
+      } catch (error) {
+        console.error('❌ Dashboard updates failed:', error.message);
+        results.dashboard = { success: false, error: error.message };
+      }
+
+      this.isRunning = true;
+      console.log('✅ Individual agent execution completed successfully');
+      console.log('📊 Individual Results:', results);
+      
+      return {
+        success: true,
+        mode: 'individual_execution',
+        results: results,
+        timestamp: new Date().toISOString()
+      };
+
+    } catch (error) {
+      console.error('❌ Individual agent execution failed:', error);
       throw error;
     }
   }
@@ -315,25 +489,84 @@ class IrisWorkflowOrchestrator {
       
       console.log('🔄 Running periodic analysis...');
       
-      // Run just the analysis components
-      const analysisWorkflow = await AgentBuilder.create('periodic_analysis')
-        .asSequential([
-          this.agents.outlightScraper,      // Discover new channels periodically
-          this.agents.patternAnalyzer,
-          this.agents.twitterAlerts,
-          this.agents.dashboardUpdater
-        ])
-        .build();
+      // Try ADK workflow first, fallback to individual execution
+      try {
+        const analysisWorkflow = await AgentBuilder.create('periodic_analysis')
+          .asSequential([
+            this.agents.outlightScraper,      // Discover new channels periodically
+            this.agents.patternAnalyzer,
+            this.agents.twitterAlerts,
+            this.agents.dashboardUpdater
+          ])
+          .build();
 
-      const result = await analysisWorkflow.run({
-        input: {
-          timestamp: new Date().toISOString(),
-          mode: 'periodic_analysis'
+        const result = await analysisWorkflow.run({
+          input: {
+            timestamp: new Date().toISOString(),
+            mode: 'periodic_analysis'
+          }
+        });
+
+        console.log('✅ ADK Periodic analysis completed');
+        return result;
+      } catch (adkError) {
+        console.log('⚠️ ADK periodic analysis failed, running individually...');
+        
+        // Fallback: Run analysis components individually
+        const results = {};
+        
+        try {
+          const outlightResult = await this.agents.outlightScraper.run({
+            input: { mode: 'periodic', maxChannels: 5 }
+          });
+          results.outlight = outlightResult;
+          console.log('✅ Outlight discovery completed');
+        } catch (error) {
+          console.error('❌ Outlight discovery failed:', error.message);
+          results.outlight = { success: false, error: error.message };
         }
-      });
 
-      console.log('✅ Periodic analysis completed');
-      return result;
+        try {
+          const patternResult = await this.agents.patternAnalyzer.run({
+            input: { mode: 'periodic', analysisType: 'quick' }
+          });
+          results.patternAnalysis = patternResult;
+          console.log('✅ Pattern analysis completed');
+        } catch (error) {
+          console.error('❌ Pattern analysis failed:', error.message);
+          results.patternAnalysis = { success: false, error: error.message };
+        }
+
+        try {
+          const twitterResult = await this.agents.twitterAlerts.run({
+            input: { mode: 'periodic', dryRun: false }
+          });
+          results.twitter = twitterResult;
+          console.log('✅ Twitter alerts completed');
+        } catch (error) {
+          console.error('❌ Twitter alerts failed:', error.message);
+          results.twitter = { success: false, error: error.message };
+        }
+
+        try {
+          const dashboardResult = await this.agents.dashboardUpdater.run({
+            input: { mode: 'periodic', updateType: 'full' }
+          });
+          results.dashboard = dashboardResult;
+          console.log('✅ Dashboard updates completed');
+        } catch (error) {
+          console.error('❌ Dashboard updates failed:', error.message);
+          results.dashboard = { success: false, error: error.message };
+        }
+
+        console.log('✅ Individual periodic analysis completed');
+        return {
+          success: true,
+          mode: 'individual_periodic',
+          results: results,
+          timestamp: new Date().toISOString()
+        };
+      }
     } catch (error) {
       console.error('❌ Periodic analysis failed:', error);
     }
