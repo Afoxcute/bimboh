@@ -1133,107 +1133,22 @@ class MarketDataTool {
     try {
       console.log('📊 Fetching market data...');
       
-      // Try to import and run the bitquery data collection
-      try {
-        const { fetchAndPushMemecoins } = await import('../bitquery/scripts/memecoins.mjs');
-        const { fetchAndPushPrices } = await import('../bitquery/scripts/prices.mjs');
-        const { fetchMarketData, updateTokenMarketData } = await import('../bitquery/scripts/market-data.mjs');
+      // Import and run the bitquery data collection
+      const { fetchAndPushMemecoins } = await import('../bitquery/scripts/memecoins.mjs');
+      const { fetchAndPushPrices } = await import('../bitquery/scripts/prices.mjs');
+      const { fetchMarketData, updateTokenMarketData } = await import('../bitquery/scripts/market-data.mjs');
 
-        await fetchAndPushMemecoins();
-        await fetchAndPushPrices();
-        await fetchMarketData();
-
-        return {
-          success: true,
-          message: 'Market data collection completed successfully'
-        };
-      } catch (importError) {
-        console.log('⚠️ Bitquery scripts import failed, using fallback method...');
-        console.log('Import error:', importError.message);
-        
-        // Fallback: Use a simplified market data fetch
-        return await this.fetchMarketDataFallback();
-      }
-    } catch (error) {
-      console.error('Market data error:', error);
-      return { success: false, error: error.message };
-    }
-  }
-
-  async fetchMarketDataFallback() {
-    try {
-      console.log('📊 Using fallback market data method...');
-      
-      // Simple market data fetch using direct API calls
-      const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd');
-      const data = await response.json();
-      
-      const solPrice = data.solana?.usd || 0;
-      
-      // First, ensure we have a SOL token entry in the tokens table
-      const { data: existingToken, error: tokenError } = await this.supabase
-        .from('tokens')
-        .select('uri')
-        .eq('symbol', 'SOL')
-        .single();
-
-      let tokenUri = 'https://solana.com'; // Default URI for SOL
-      
-      if (tokenError && tokenError.code === 'PGRST116') {
-        // Token doesn't exist, create it
-        const { data: newToken, error: createError } = await this.supabase
-          .from('tokens')
-          .insert({
-            uri: tokenUri,
-            name: 'Solana',
-            symbol: 'SOL',
-            description: 'Solana blockchain native token',
-            market_cap: 0
-          })
-          .select('uri')
-          .single();
-        
-        if (createError) throw createError;
-        tokenUri = newToken.uri;
-      } else if (existingToken) {
-        tokenUri = existingToken.uri;
-      }
-      
-      // Store price data in the prices table
-      const { error: priceError } = await this.supabase
-        .from('prices')
-        .insert({
-          token_uri: tokenUri,
-          price_usd: solPrice,
-          price_sol: 1.0, // SOL price in SOL is always 1
-          trade_at: new Date().toISOString(),
-          volume_24h: 0,
-          market_cap: 0,
-          price_change_24h: 0,
-          metadata: {
-            source: 'coingecko_fallback',
-            fetched_at: new Date().toISOString()
-          }
-        });
-
-      if (priceError) throw priceError;
+      await fetchAndPushMemecoins();
+      await fetchAndPushPrices();
+      await fetchMarketData();
 
       return {
         success: true,
-        message: 'Fallback market data fetched successfully',
-        data: {
-          sol_price: solPrice,
-          token_uri: tokenUri,
-          source: 'coingecko_fallback'
-        }
+        message: 'Market data collection completed successfully'
       };
     } catch (error) {
-      console.error('Fallback market data error:', error);
-      return {
-        success: false,
-        error: error.message,
-        message: 'Both primary and fallback market data methods failed'
-      };
+      console.error('Market data error:', error);
+      return { success: false, error: error.message };
     }
   }
 }
