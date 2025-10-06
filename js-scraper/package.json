@@ -29,7 +29,8 @@
     "adk-test": "node test_adk_workflow.mjs",
     "migrate-telegram": "node migrate_telegram_timestamps.mjs",
     "ai-analysis": "node ai_content_analysis_agents.mjs",
-    "setup-ai-schema": "echo 'Run ai_analysis_schema.sql in your Supabase SQL Editor'"
+    "setup-ai-schema": "echo 'Run ai_analysis_schema.sql in your Supabase SQL Editor'",
+    "install-bitquery-deps": "node install-bitquery-deps.mjs"
   },
   "dependencies": {
     "@iqai/adk": "^0.3.6",

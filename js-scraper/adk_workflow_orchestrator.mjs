@@ -1133,22 +1133,71 @@ class MarketDataTool {
     try {
       console.log('📊 Fetching market data...');
       
-      // Import and run the bitquery data collection
-      const { fetchAndPushMemecoins } = await import('../bitquery/scripts/memecoins.mjs');
-      const { fetchAndPushPrices } = await import('../bitquery/scripts/prices.mjs');
-      const { fetchMarketData, updateTokenMarketData } = await import('../bitquery/scripts/market-data.mjs');
+      // Try to import and run the bitquery data collection
+      try {
+        const { fetchAndPushMemecoins } = await import('../bitquery/scripts/memecoins.mjs');
+        const { fetchAndPushPrices } = await import('../bitquery/scripts/prices.mjs');
+        const { fetchMarketData, updateTokenMarketData } = await import('../bitquery/scripts/market-data.mjs');
 
-      await fetchAndPushMemecoins();
-      await fetchAndPushPrices();
-      await fetchMarketData();
+        await fetchAndPushMemecoins();
+        await fetchAndPushPrices();
+        await fetchMarketData();
 
-      return {
-        success: true,
-        message: 'Market data collection completed successfully'
-      };
+        return {
+          success: true,
+          message: 'Market data collection completed successfully'
+        };
+      } catch (importError) {
+        console.log('⚠️ Bitquery scripts import failed, using fallback method...');
+        console.log('Import error:', importError.message);
+        
+        // Fallback: Use a simplified market data fetch
+        return await this.fetchMarketDataFallback();
+      }
     } catch (error) {
       console.error('Market data error:', error);
       return { success: false, error: error.message };
+    }
+  }
+
+  async fetchMarketDataFallback() {
+    try {
+      console.log('📊 Using fallback market data method...');
+      
+      // Simple market data fetch using direct API calls
+      const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd');
+      const data = await response.json();
+      
+      // Store basic market data
+      const { error } = await this.supabase
+        .from('market_data')
+        .insert({
+          token_symbol: 'SOL',
+          price_usd: data.solana?.usd || 0,
+          market_cap: 0,
+          volume_24h: 0,
+          price_change_24h: 0,
+          fetched_at: new Date().toISOString(),
+          source: 'coingecko_fallback'
+        });
+
+      if (error) throw error;
+
+      return {
+        success: true,
+        message: 'Fallback market data fetched successfully',
+        data: {
+          sol_price: data.solana?.usd || 0,
+          source: 'coingecko_fallback'
+        }
+      };
+    } catch (error) {
+      console.error('Fallback market data error:', error);
+      return {
+        success: false,
+        error: error.message,
+        message: 'Both primary and fallback market data methods failed'
+      };
     }
   }
 }
