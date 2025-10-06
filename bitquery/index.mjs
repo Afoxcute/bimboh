@@ -99,7 +99,10 @@ async function getTokensForMarketDataUpdate() {
     const { createClient } = await import("@supabase/supabase-js");
     const dotenv = await import("dotenv");
     
+    // Load environment variables from current directory and parent directory
     dotenv.config();
+    dotenv.config({ path: '../.env' });
+    dotenv.config({ path: '../../.env' });
     
     const supabaseUrl = process.env.SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_ANON_SECRET;

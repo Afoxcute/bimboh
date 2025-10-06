@@ -12,7 +12,10 @@ import { Headers } from 'node-fetch';
 global.fetch = fetch;
 global.Headers = Headers;
 
+// Load environment variables from current directory and parent directory
 dotenv.config();
+dotenv.config({ path: '../.env' });
+dotenv.config({ path: '../../.env' });
 
 // Ensure results directory exists
 const resultsDir = path.join(process.cwd(), 'results', 'memecoins');
