@@ -1,6 +1,14 @@
 import { AgentBuilder, LlmAgent } from '@iqai/adk';
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
+import {
+  SentimentAnalysisTool,
+  TrendDetectionTool,
+  ContentClassificationTool,
+  RiskAssessmentTool,
+  MemecoinAnalysisTool,
+  SocialMediaIntelligenceTool
+} from './ai_content_analysis_agents.mjs';
 import { TwitterIntegration } from './twitter_integration.mjs';
 import { MemecoinPatternAnalyzer } from './pattern_analysis.mjs';
 import { TelegramChannelScraper } from './telegram_scraper.mjs';
@@ -188,6 +196,114 @@ class IrisWorkflowOrchestrator {
         ]
       });
 
+      // 8. AI Sentiment Analysis Agent
+      this.agents.sentimentAnalyzer = new LlmAgent({
+        name: 'sentiment_analyzer',
+        model: 'gpt-3.5-turbo',
+        instruction: `You are an AI-powered sentiment analysis specialist. Your role is to:
+        - Analyze emotional tone and sentiment of social media content
+        - Detect positive, negative, and neutral sentiment patterns
+        - Identify emotional indicators (joy, anger, fear, surprise, sadness)
+        - Assess sentiment confidence levels
+        - Track sentiment trends over time
+        - Provide insights for investment decisions
+        
+        Focus on accurate sentiment detection and emotional intelligence analysis.`,
+        tools: [
+          new SentimentAnalysisTool(this.supabase)
+        ]
+      });
+
+      // 9. AI Trend Detection Agent
+      this.agents.trendDetector = new LlmAgent({
+        name: 'trend_detector',
+        model: 'gpt-3.5-turbo',
+        instruction: `You are an AI-powered trend detection specialist. Your role is to:
+        - Identify emerging trends and patterns in memecoin content
+        - Detect viral content and trending tokens
+        - Analyze hashtag and mention patterns
+        - Track engagement trends and spikes
+        - Identify coordinated posting and bot activity
+        - Predict viral potential of content
+        
+        Focus on early trend detection and pattern recognition.`,
+        tools: [
+          new TrendDetectionTool(this.supabase)
+        ]
+      });
+
+      // 10. AI Content Classification Agent
+      this.agents.contentClassifier = new LlmAgent({
+        name: 'content_classifier',
+        model: 'gpt-3.5-turbo',
+        instruction: `You are an AI-powered content classification specialist. Your role is to:
+        - Categorize and classify social media content
+        - Identify content types (announcements, discussions, promotions, etc.)
+        - Detect FUD, scams, and misleading content
+        - Classify memecoin-related content accurately
+        - Generate relevant tags and metadata
+        - Filter content by quality and relevance
+        
+        Focus on accurate content categorization and quality assessment.`,
+        tools: [
+          new ContentClassificationTool(this.supabase)
+        ]
+      });
+
+      // 11. AI Risk Assessment Agent
+      this.agents.riskAssessor = new LlmAgent({
+        name: 'risk_assessor',
+        model: 'gpt-3.5-turbo',
+        instruction: `You are an AI-powered risk assessment specialist. Your role is to:
+        - Evaluate investment risks and red flags in memecoin content
+        - Detect scam indicators and warning signs
+        - Assess project legitimacy and team credibility
+        - Identify pump and dump schemes
+        - Evaluate market manipulation attempts
+        - Provide risk-based investment recommendations
+        
+        Focus on protecting users from high-risk investments and scams.`,
+        tools: [
+          new RiskAssessmentTool(this.supabase)
+        ]
+      });
+
+      // 12. AI Memecoin Analysis Agent
+      this.agents.memecoinAnalyzer = new LlmAgent({
+        name: 'memecoin_analyzer',
+        model: 'gpt-3.5-turbo',
+        instruction: `You are an AI-powered memecoin analysis specialist. Your role is to:
+        - Analyze memecoin-specific content and trends
+        - Evaluate viral potential and meme quality
+        - Assess community strength and engagement
+        - Analyze market sentiment for memecoins
+        - Identify successful meme patterns and strategies
+        - Predict memecoin success probability
+        
+        Focus on memecoin-specific analysis and viral potential assessment.`,
+        tools: [
+          new MemecoinAnalysisTool(this.supabase)
+        ]
+      });
+
+      // 13. AI Social Media Intelligence Agent
+      this.agents.socialIntelligence = new LlmAgent({
+        name: 'social_intelligence',
+        model: 'gpt-3.5-turbo',
+        instruction: `You are an AI-powered social media intelligence specialist. Your role is to:
+        - Combine all analysis types for comprehensive insights
+        - Provide holistic intelligence on social media content
+        - Generate actionable recommendations based on multiple analysis factors
+        - Identify high-value opportunities and threats
+        - Create intelligence reports for decision making
+        - Coordinate analysis across all specialized agents
+        
+        Focus on comprehensive intelligence synthesis and actionable insights.`,
+        tools: [
+          new SocialMediaIntelligenceTool(this.supabase)
+        ]
+      });
+
       console.log('✅ All ADK agents initialized successfully');
     } catch (error) {
       console.error('❌ Error initializing agents:', error);
@@ -209,9 +325,15 @@ class IrisWorkflowOrchestrator {
           this.agents.tiktokScraper,        // Step 2: Scrape TikTok content
           this.agents.telegramScraper,      // Step 3: Scrape existing Telegram channels
           this.agents.outlightScraper,      // Step 4: Discover new channels from Outlight.fun
-          this.agents.patternAnalyzer,      // Step 5: Analyze patterns and correlations
-          this.agents.twitterAlerts,        // Step 6: Generate and post alerts
-          this.agents.dashboardUpdater      // Step 7: Update frontend dashboard
+          this.agents.sentimentAnalyzer,    // Step 5: AI Sentiment Analysis
+          this.agents.trendDetector,        // Step 6: AI Trend Detection
+          this.agents.contentClassifier,    // Step 7: AI Content Classification
+          this.agents.riskAssessor,         // Step 8: AI Risk Assessment
+          this.agents.memecoinAnalyzer,     // Step 9: AI Memecoin Analysis
+          this.agents.socialIntelligence,   // Step 10: AI Social Media Intelligence
+          this.agents.patternAnalyzer,      // Step 11: Analyze patterns and correlations
+          this.agents.twitterAlerts,        // Step 12: Generate and post alerts
+          this.agents.dashboardUpdater      // Step 13: Update frontend dashboard
         ])
         .build();
 
@@ -431,8 +553,107 @@ class IrisWorkflowOrchestrator {
         results.twitter = { success: false, error: error.message };
       }
 
-      // Step 7: Dashboard Updates
-      console.log('📱 Step 7: Updating dashboard...');
+      // Step 5: AI Sentiment Analysis
+      console.log('🧠 Step 5: Running AI sentiment analysis...');
+      try {
+        const sentimentTool = new SentimentAnalysisTool(this.supabase);
+        const sentimentResult = await sentimentTool.execute({ 
+          content: 'Test content for sentiment analysis', 
+          platform: 'test',
+          contentId: 'test_sentiment'
+        });
+        results.sentimentAnalysis = sentimentResult;
+        console.log('✅ AI sentiment analysis completed');
+      } catch (error) {
+        console.error('❌ AI sentiment analysis failed:', error.message);
+        results.sentimentAnalysis = { success: false, error: error.message };
+      }
+
+      // Step 6: AI Trend Detection
+      console.log('📈 Step 6: Running AI trend detection...');
+      try {
+        const trendTool = new TrendDetectionTool(this.supabase);
+        const trendResult = await trendTool.execute({ 
+          platform: 'test',
+          timeRange: '24h',
+          minMentions: 2
+        });
+        results.trendDetection = trendResult;
+        console.log('✅ AI trend detection completed');
+      } catch (error) {
+        console.error('❌ AI trend detection failed:', error.message);
+        results.trendDetection = { success: false, error: error.message };
+      }
+
+      // Step 7: AI Content Classification
+      console.log('🏷️ Step 7: Running AI content classification...');
+      try {
+        const classificationTool = new ContentClassificationTool(this.supabase);
+        const classificationResult = await classificationTool.execute({ 
+          content: 'Test memecoin announcement content', 
+          platform: 'test',
+          contentId: 'test_classification'
+        });
+        results.contentClassification = classificationResult;
+        console.log('✅ AI content classification completed');
+      } catch (error) {
+        console.error('❌ AI content classification failed:', error.message);
+        results.contentClassification = { success: false, error: error.message };
+      }
+
+      // Step 8: AI Risk Assessment
+      console.log('⚠️ Step 8: Running AI risk assessment...');
+      try {
+        const riskTool = new RiskAssessmentTool(this.supabase);
+        const riskResult = await riskTool.execute({ 
+          content: 'Test investment content', 
+          platform: 'test',
+          tokenSymbol: 'TEST',
+          contentId: 'test_risk'
+        });
+        results.riskAssessment = riskResult;
+        console.log('✅ AI risk assessment completed');
+      } catch (error) {
+        console.error('❌ AI risk assessment failed:', error.message);
+        results.riskAssessment = { success: false, error: error.message };
+      }
+
+      // Step 9: AI Memecoin Analysis
+      console.log('🪙 Step 9: Running AI memecoin analysis...');
+      try {
+        const memecoinTool = new MemecoinAnalysisTool(this.supabase);
+        const memecoinResult = await memecoinTool.execute({ 
+          content: 'Test memecoin content with viral potential', 
+          platform: 'test',
+          tokenSymbol: 'TEST',
+          contentId: 'test_memecoin'
+        });
+        results.memecoinAnalysis = memecoinResult;
+        console.log('✅ AI memecoin analysis completed');
+      } catch (error) {
+        console.error('❌ AI memecoin analysis failed:', error.message);
+        results.memecoinAnalysis = { success: false, error: error.message };
+      }
+
+      // Step 10: AI Social Media Intelligence
+      console.log('🔍 Step 10: Running AI social media intelligence...');
+      try {
+        const intelligenceTool = new SocialMediaIntelligenceTool(this.supabase);
+        const intelligenceResult = await intelligenceTool.execute({ 
+          content: 'Test comprehensive social media content', 
+          platform: 'test',
+          tokenSymbol: 'TEST',
+          contentId: 'test_intelligence'
+        });
+        results.socialIntelligence = intelligenceResult;
+        console.log('✅ AI social media intelligence completed');
+      } catch (error) {
+        console.error('❌ AI social media intelligence failed:', error.message);
+        results.socialIntelligence = { success: false, error: error.message };
+      }
+
+      // Step 11: Dashboard Updates
+      console.log('📱 Step 11: Updating dashboard...');
       try {
         const dashboardTool = new DashboardSyncTool(this.supabase);
         const dashboardResult = await dashboardTool.execute({ mode: 'test', updateType: 'status' });
