@@ -455,6 +455,7 @@ class RiskAssessmentTool {
         token_symbol: tokenSymbol,
         content,
         risk_score: riskAssessment.riskScore,
+        risk_level: riskAssessment.riskLevel,
         risk_factors: riskAssessment.riskFactors,
         red_flags: riskAssessment.redFlags,
         confidence: riskAssessment.confidence

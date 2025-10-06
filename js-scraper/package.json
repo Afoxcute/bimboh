@@ -29,6 +29,7 @@
     "adk-test": "node test_adk_workflow.mjs",
     "migrate-telegram": "node migrate_telegram_timestamps.mjs",
     "ai-analysis": "node ai_content_analysis_agents.mjs",
+    "test-ai-fix": "node test_ai_analysis_fix.mjs",
     "setup-ai-schema": "echo 'Run ai_analysis_schema.sql in your Supabase SQL Editor'"
   },
   "dependencies": {
