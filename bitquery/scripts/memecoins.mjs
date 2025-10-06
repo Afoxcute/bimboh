@@ -12,10 +12,18 @@ import { Headers } from 'node-fetch';
 global.fetch = fetch;
 global.Headers = Headers;
 
-// Load environment variables from current directory and parent directory
-dotenv.config();
-dotenv.config({ path: '../.env' });
-dotenv.config({ path: '../../.env' });
+// Load environment variables from multiple possible locations
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Try loading from multiple locations
+dotenv.config(); // Current working directory
+dotenv.config({ path: join(__dirname, '../.env') }); // bitquery/.env
+dotenv.config({ path: join(__dirname, '../../.env') }); // root/.env
+dotenv.config({ path: join(__dirname, '../../js-scraper/.env') }); // js-scraper/.env
 
 // Ensure results directory exists
 const resultsDir = path.join(process.cwd(), 'results', 'memecoins');

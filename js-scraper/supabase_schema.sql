@@ -27,6 +27,8 @@ CREATE TABLE IF NOT EXISTS tokens (
     symbol TEXT,
     description TEXT,
     image_url TEXT,
+    address TEXT, -- Solana token address
+    create_tx TEXT, -- Transaction signature that created the token
     market_cap DECIMAL(20,2),
     total_supply BIGINT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -38,6 +40,8 @@ CREATE TABLE IF NOT EXISTS tokens (
 -- Create indexes for tokens
 CREATE INDEX IF NOT EXISTS idx_tokens_uri ON tokens(uri);
 CREATE INDEX IF NOT EXISTS idx_tokens_symbol ON tokens(symbol);
+CREATE INDEX IF NOT EXISTS idx_tokens_address ON tokens(address);
+CREATE INDEX IF NOT EXISTS idx_tokens_create_tx ON tokens(create_tx);
 CREATE INDEX IF NOT EXISTS idx_tokens_created_at ON tokens(created_at);
 CREATE INDEX IF NOT EXISTS idx_tokens_market_cap ON tokens(market_cap);
 

@@ -99,10 +99,18 @@ async function getTokensForMarketDataUpdate() {
     const { createClient } = await import("@supabase/supabase-js");
     const dotenv = await import("dotenv");
     
-    // Load environment variables from current directory and parent directory
-    dotenv.config();
-    dotenv.config({ path: '../.env' });
-    dotenv.config({ path: '../../.env' });
+    // Load environment variables from multiple possible locations
+    const { fileURLToPath } = await import('url');
+    const { dirname, join } = await import('path');
+    
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = dirname(__filename);
+    
+    // Try loading from multiple locations
+    dotenv.config(); // Current working directory
+    dotenv.config({ path: join(__dirname, '.env') }); // bitquery/.env
+    dotenv.config({ path: join(__dirname, '../.env') }); // root/.env
+    dotenv.config({ path: join(__dirname, '../js-scraper/.env') }); // js-scraper/.env
     
     const supabaseUrl = process.env.SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_ANON_SECRET;
