@@ -1206,8 +1206,6 @@ class MessageAnalysisTool { async execute() { return { success: true }; } }
 class MessageExtractionTool { async execute() { return { success: true }; } }
 class DataValidationTool { async execute() { return { success: true }; } }
 class CorrelationCalculatorTool { async execute() { return { success: true }; } }
-class TrendDetectionTool { async execute() { return { success: true }; } }
-class RiskAssessmentTool { async execute() { return { success: true }; } }
 class PriceTrackingTool { async execute() { return { success: true }; } }
 class TokenDiscoveryTool { async execute() { return { success: true }; } }
 class AlertGenerationTool { async execute() { return { success: true }; } }
