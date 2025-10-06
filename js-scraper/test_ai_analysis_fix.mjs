@@ -27,19 +27,19 @@ async function testRiskAssessment() {
     const testCases = [
       {
         content: 'This is a guaranteed 100x return investment!',
-        platform: 'test',
+        platform: 'tiktok',
         tokenSymbol: 'SCAM',
         expectedRiskLevel: 'high'
       },
       {
         content: 'New token launch with strong community support',
-        platform: 'test',
+        platform: 'tiktok',
         tokenSymbol: 'NEW',
         expectedRiskLevel: 'low'
       },
       {
         content: 'Presale token with anonymous team',
-        platform: 'test',
+        platform: 'tiktok',
         tokenSymbol: 'PRESALE',
         expectedRiskLevel: 'medium'
       }

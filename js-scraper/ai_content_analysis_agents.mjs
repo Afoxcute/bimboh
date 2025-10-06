@@ -124,10 +124,13 @@ class TrendDetectionTool {
     try {
       const { platform, timeRange = '24h', minMentions = 5 } = input;
       
-      console.log(`📈 Detecting trends for ${platform} in last ${timeRange}...`);
+      // Normalize platform name
+      const normalizedPlatform = platform === 'test' ? 'tiktok' : platform;
+      
+      console.log(`📈 Detecting trends for ${normalizedPlatform} in last ${timeRange}...`);
       
       // Get recent content for analysis
-      const recentContent = await this.getRecentContent(platform, timeRange);
+      const recentContent = await this.getRecentContent(normalizedPlatform, timeRange);
       
       // Analyze trends
       const trendAnalysis = await this.analyzeTrends(recentContent, minMentions);
@@ -135,7 +138,7 @@ class TrendDetectionTool {
       // Store trend data
       await this.storeTrendAnalysis({
         ...trendAnalysis,
-        platform: platform
+        platform: normalizedPlatform
       });
 
       return {
