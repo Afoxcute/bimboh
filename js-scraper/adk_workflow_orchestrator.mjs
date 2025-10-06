@@ -1168,26 +1168,62 @@ class MarketDataTool {
       const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd');
       const data = await response.json();
       
-      // Store basic market data
-      const { error } = await this.supabase
-        .from('market_data')
+      const solPrice = data.solana?.usd || 0;
+      
+      // First, ensure we have a SOL token entry in the tokens table
+      const { data: existingToken, error: tokenError } = await this.supabase
+        .from('tokens')
+        .select('uri')
+        .eq('symbol', 'SOL')
+        .single();
+
+      let tokenUri = 'https://solana.com'; // Default URI for SOL
+      
+      if (tokenError && tokenError.code === 'PGRST116') {
+        // Token doesn't exist, create it
+        const { data: newToken, error: createError } = await this.supabase
+          .from('tokens')
+          .insert({
+            uri: tokenUri,
+            name: 'Solana',
+            symbol: 'SOL',
+            description: 'Solana blockchain native token',
+            market_cap: 0
+          })
+          .select('uri')
+          .single();
+        
+        if (createError) throw createError;
+        tokenUri = newToken.uri;
+      } else if (existingToken) {
+        tokenUri = existingToken.uri;
+      }
+      
+      // Store price data in the prices table
+      const { error: priceError } = await this.supabase
+        .from('prices')
         .insert({
-          token_symbol: 'SOL',
-          price_usd: data.solana?.usd || 0,
-          market_cap: 0,
+          token_uri: tokenUri,
+          price_usd: solPrice,
+          price_sol: 1.0, // SOL price in SOL is always 1
+          trade_at: new Date().toISOString(),
           volume_24h: 0,
+          market_cap: 0,
           price_change_24h: 0,
-          fetched_at: new Date().toISOString(),
-          source: 'coingecko_fallback'
+          metadata: {
+            source: 'coingecko_fallback',
+            fetched_at: new Date().toISOString()
+          }
         });
 
-      if (error) throw error;
+      if (priceError) throw priceError;
 
       return {
         success: true,
         message: 'Fallback market data fetched successfully',
         data: {
-          sol_price: data.solana?.usd || 0,
+          sol_price: solPrice,
+          token_uri: tokenUri,
           source: 'coingecko_fallback'
         }
       };
