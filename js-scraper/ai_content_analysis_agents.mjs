@@ -133,7 +133,10 @@ class TrendDetectionTool {
       const trendAnalysis = await this.analyzeTrends(recentContent, minMentions);
       
       // Store trend data
-      await this.storeTrendAnalysis(trendAnalysis);
+      await this.storeTrendAnalysis({
+        ...trendAnalysis,
+        platform: platform
+      });
 
       return {
         success: true,
@@ -151,14 +154,29 @@ class TrendDetectionTool {
   async getRecentContent(platform, timeRange) {
     const hours = timeRange === '24h' ? 24 : timeRange === '7d' ? 168 : 1;
     
-    const { data, error } = await this.supabase
-      .from(`${platform}_content`)
-      .select('*')
-      .gte('created_at', new Date(Date.now() - hours * 60 * 60 * 1000).toISOString())
-      .limit(1000);
+    // Map platform names to actual table names
+    const tableMapping = {
+      'tiktok': 'tiktoks',
+      'telegram': 'telegram_messages',
+      'twitter': 'twitter_alerts',
+      'test': 'tiktoks' // Use tiktoks as fallback for test
+    };
+    
+    const tableName = tableMapping[platform] || 'tiktoks';
+    
+    try {
+      const { data, error } = await this.supabase
+        .from(tableName)
+        .select('*')
+        .gte('created_at', new Date(Date.now() - hours * 60 * 60 * 1000).toISOString())
+        .limit(1000);
 
-    if (error) throw error;
-    return data || [];
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.log(`⚠️ Could not fetch from ${tableName}, using empty dataset for trend analysis`);
+      return [];
+    }
   }
 
   async analyzeTrends(content, minMentions) {

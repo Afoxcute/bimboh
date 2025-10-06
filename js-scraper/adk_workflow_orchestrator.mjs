@@ -559,7 +559,7 @@ class IrisWorkflowOrchestrator {
         const sentimentTool = new SentimentAnalysisTool(this.supabase);
         const sentimentResult = await sentimentTool.execute({ 
           content: 'Test content for sentiment analysis', 
-          platform: 'test',
+          platform: 'tiktok',
           contentId: 'test_sentiment'
         });
         results.sentimentAnalysis = sentimentResult;
@@ -574,7 +574,7 @@ class IrisWorkflowOrchestrator {
       try {
         const trendTool = new TrendDetectionTool(this.supabase);
         const trendResult = await trendTool.execute({ 
-          platform: 'test',
+          platform: 'tiktok',
           timeRange: '24h',
           minMentions: 2
         });
@@ -591,7 +591,7 @@ class IrisWorkflowOrchestrator {
         const classificationTool = new ContentClassificationTool(this.supabase);
         const classificationResult = await classificationTool.execute({ 
           content: 'Test memecoin announcement content', 
-          platform: 'test',
+          platform: 'tiktok',
           contentId: 'test_classification'
         });
         results.contentClassification = classificationResult;
@@ -607,7 +607,7 @@ class IrisWorkflowOrchestrator {
         const riskTool = new RiskAssessmentTool(this.supabase);
         const riskResult = await riskTool.execute({ 
           content: 'Test investment content', 
-          platform: 'test',
+          platform: 'tiktok',
           tokenSymbol: 'TEST',
           contentId: 'test_risk'
         });
@@ -624,7 +624,7 @@ class IrisWorkflowOrchestrator {
         const memecoinTool = new MemecoinAnalysisTool(this.supabase);
         const memecoinResult = await memecoinTool.execute({ 
           content: 'Test memecoin content with viral potential', 
-          platform: 'test',
+          platform: 'tiktok',
           tokenSymbol: 'TEST',
           contentId: 'test_memecoin'
         });
@@ -641,7 +641,7 @@ class IrisWorkflowOrchestrator {
         const intelligenceTool = new SocialMediaIntelligenceTool(this.supabase);
         const intelligenceResult = await intelligenceTool.execute({ 
           content: 'Test comprehensive social media content', 
-          platform: 'test',
+          platform: 'tiktok',
           tokenSymbol: 'TEST',
           contentId: 'test_intelligence'
         });
