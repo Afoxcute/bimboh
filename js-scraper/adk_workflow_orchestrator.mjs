@@ -13,6 +13,7 @@ import { TwitterIntegration } from './twitter_integration.mjs';
 import { MemecoinPatternAnalyzer } from './pattern_analysis.mjs';
 import { TelegramChannelScraper } from './telegram_scraper.mjs';
 import { OutlightScraper } from './outlight-scraper.mjs';
+import RealtimeDecisionAgent from './realtime_decision_agent.mjs';
 import puppeteer from 'puppeteer';
 import { extractComments, VideoScraper } from "./scraper.mjs";
 import fetch from 'node-fetch';
@@ -41,6 +42,9 @@ class IrisWorkflowOrchestrator {
     this.workflow = null;
     this.isRunning = false;
     this.sessionId = `iris_session_${Date.now()}`;
+    
+    // Initialize decision agent
+    this.decisionAgent = new RealtimeDecisionAgent(this.supabase);
     
     // Initialize agents
     this.initializeAgents();
@@ -304,6 +308,10 @@ class IrisWorkflowOrchestrator {
         ]
       });
 
+      // 14. Real-Time Decision Making Agent
+      console.log('🧠 Initializing Real-Time Decision Making Agent...');
+      await this.decisionAgent.initialize();
+
       console.log('✅ All ADK agents initialized successfully');
     } catch (error) {
       console.error('❌ Error initializing agents:', error);
@@ -334,6 +342,7 @@ class IrisWorkflowOrchestrator {
           this.agents.patternAnalyzer,      // Step 11: Analyze patterns and correlations
           this.agents.twitterAlerts,        // Step 12: Generate and post alerts
           this.agents.dashboardUpdater      // Step 13: Update frontend dashboard
+          // Note: Decision agent runs separately for real-time processing
         ])
         .build();
 
@@ -456,6 +465,17 @@ class IrisWorkflowOrchestrator {
         this.isRunning = true;
         console.log('✅ ADK Workflow execution completed successfully');
         console.log('📊 Workflow Results:', result);
+
+        // Process real-time decisions after data collection
+        console.log('🧠 Processing real-time decisions...');
+        try {
+          const decisionResult = await this.decisionAgent.processRealtimeData();
+          console.log('✅ Real-time decision processing completed:', decisionResult);
+        } catch (decisionError) {
+          console.error('❌ Decision processing failed:', decisionError);
+          // Don't fail the entire workflow for decision errors
+        }
+
         return result;
 
       } catch (adkError) {
@@ -667,6 +687,17 @@ class IrisWorkflowOrchestrator {
       this.isRunning = true;
       console.log('✅ Individual agent execution completed successfully');
       console.log('📊 Individual Results:', results);
+
+      // Process real-time decisions after data collection
+      console.log('🧠 Processing real-time decisions...');
+      try {
+        const decisionResult = await this.decisionAgent.processRealtimeData();
+        console.log('✅ Real-time decision processing completed:', decisionResult);
+        results.decisions = decisionResult;
+      } catch (decisionError) {
+        console.error('❌ Decision processing failed:', decisionError);
+        results.decisions = { success: false, error: decisionError.message };
+      }
       
       return {
         success: true,

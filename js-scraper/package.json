@@ -35,7 +35,10 @@
     "test-intelligent-twitter": "node test_intelligent_twitter.mjs",
     "setup-twitter-schema": "echo 'Run twitter_memory_schema.sql in your Supabase SQL Editor'",
     "setup-twitter-schema-simple": "echo 'Run twitter_memory_schema_simple.sql in your Supabase SQL Editor'",
-    "migrate-twitter": "node migrate_to_intelligent_twitter.mjs"
+    "migrate-twitter": "node migrate_to_intelligent_twitter.mjs",
+    "setup-decision-schema": "echo 'Run decision_schema.sql in your Supabase SQL Editor'",
+    "test-decision-agent": "node test_decision_agent.mjs",
+    "decision-agent": "node realtime_decision_agent.mjs"
   },
   "dependencies": {
     "@iqai/adk": "^0.3.6",
