@@ -178,10 +178,13 @@ CREATE INDEX IF NOT EXISTS idx_mentions_sentiment ON mentions(sentiment);
 -- Prices table - stores token price data
 CREATE TABLE IF NOT EXISTS prices (
     id SERIAL PRIMARY KEY,
+    token_id INTEGER REFERENCES tokens(id) ON DELETE CASCADE,
     token_uri TEXT REFERENCES tokens(uri) ON DELETE CASCADE,
     price_usd DECIMAL(20,8),
     price_sol DECIMAL(20,8),
     trade_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    timestamp TIMESTAMP WITH TIME ZONE, -- Block timestamp from blockchain
+    is_latest BOOLEAN DEFAULT false, -- Flag to mark the latest price for each token
     volume_24h DECIMAL(20,2),
     market_cap DECIMAL(20,2),
     price_change_24h DECIMAL(10,4),
@@ -189,9 +192,17 @@ CREATE TABLE IF NOT EXISTS prices (
 );
 
 -- Create indexes for prices
+CREATE INDEX IF NOT EXISTS idx_prices_token_id ON prices(token_id);
 CREATE INDEX IF NOT EXISTS idx_prices_token_uri ON prices(token_uri);
 CREATE INDEX IF NOT EXISTS idx_prices_trade_at ON prices(trade_at);
+CREATE INDEX IF NOT EXISTS idx_prices_timestamp ON prices(timestamp);
+CREATE INDEX IF NOT EXISTS idx_prices_is_latest ON prices(is_latest);
 CREATE INDEX IF NOT EXISTS idx_prices_price_usd ON prices(price_usd);
+
+-- Create unique constraint for upsert operations
+CREATE UNIQUE INDEX IF NOT EXISTS idx_prices_unique_token_timestamp 
+ON prices(token_uri, timestamp) 
+WHERE token_uri IS NOT NULL AND timestamp IS NOT NULL;
 
 -- =====================================================
 -- PATTERN ANALYSIS TABLES

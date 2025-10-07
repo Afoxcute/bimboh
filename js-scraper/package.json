@@ -30,7 +30,12 @@
     "migrate-telegram": "node migrate_telegram_timestamps.mjs",
     "ai-analysis": "node ai_content_analysis_agents.mjs",
     "test-ai-fix": "node test_ai_analysis_fix.mjs",
-    "setup-ai-schema": "echo 'Run ai_analysis_schema.sql in your Supabase SQL Editor'"
+    "setup-ai-schema": "echo 'Run ai_analysis_schema.sql in your Supabase SQL Editor'",
+    "intelligent-twitter": "node intelligent_twitter_agents.mjs",
+    "test-intelligent-twitter": "node test_intelligent_twitter.mjs",
+    "setup-twitter-schema": "echo 'Run twitter_memory_schema.sql in your Supabase SQL Editor'",
+    "setup-twitter-schema-simple": "echo 'Run twitter_memory_schema_simple.sql in your Supabase SQL Editor'",
+    "migrate-twitter": "node migrate_to_intelligent_twitter.mjs"
   },
   "dependencies": {
     "@iqai/adk": "^0.3.6",

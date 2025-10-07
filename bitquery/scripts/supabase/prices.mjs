@@ -123,7 +123,10 @@ export async function pushPrices(filePath, dataJson) {
       }
       const { data, error } = await supabase
         .from("prices")
-        .insert(updates, { upsert: true });
+        .upsert(updates, { 
+          onConflict: 'token_uri,timestamp',
+          ignoreDuplicates: false 
+        });
 
       if (error) {
         console.error(`Error updating batch starting at index ${i}:`, error);
