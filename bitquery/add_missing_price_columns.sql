@@ -17,8 +17,7 @@ CREATE INDEX IF NOT EXISTS idx_prices_is_latest ON prices(is_latest);
 
 -- Create unique constraint for upsert operations
 CREATE UNIQUE INDEX IF NOT EXISTS idx_prices_unique_token_timestamp 
-ON prices(token_uri, timestamp) 
-WHERE token_uri IS NOT NULL AND timestamp IS NOT NULL;
+ON prices(token_uri, timestamp);
 
 -- Add comments for documentation
 COMMENT ON COLUMN prices.token_id IS 'Reference to tokens table ID';

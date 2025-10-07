@@ -201,8 +201,7 @@ CREATE INDEX IF NOT EXISTS idx_prices_price_usd ON prices(price_usd);
 
 -- Create unique constraint for upsert operations
 CREATE UNIQUE INDEX IF NOT EXISTS idx_prices_unique_token_timestamp 
-ON prices(token_uri, timestamp) 
-WHERE token_uri IS NOT NULL AND timestamp IS NOT NULL;
+ON prices(token_uri, timestamp);
 
 -- =====================================================
 -- PATTERN ANALYSIS TABLES
