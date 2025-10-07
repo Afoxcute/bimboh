@@ -14,6 +14,7 @@ import { MemecoinPatternAnalyzer } from './pattern_analysis.mjs';
 import { TelegramChannelScraper } from './telegram_scraper.mjs';
 import { OutlightScraper } from './outlight-scraper.mjs';
 import RealtimeDecisionAgent from './realtime_decision_agent.mjs';
+import AdvancedPatternRecognition from './advanced_pattern_recognition.mjs';
 import puppeteer from 'puppeteer';
 import { extractComments, VideoScraper } from "./scraper.mjs";
 import fetch from 'node-fetch';
@@ -45,6 +46,9 @@ class IrisWorkflowOrchestrator {
     
     // Initialize decision agent
     this.decisionAgent = new RealtimeDecisionAgent(this.supabase);
+    
+    // Initialize pattern recognition
+    this.patternRecognition = new AdvancedPatternRecognition(this.supabase);
     
     // Initialize agents
     this.initializeAgents();
@@ -312,6 +316,10 @@ class IrisWorkflowOrchestrator {
       console.log('🧠 Initializing Real-Time Decision Making Agent...');
       await this.decisionAgent.initialize();
 
+      // 15. Advanced Pattern Recognition System
+      console.log('🔍 Initializing Advanced Pattern Recognition System...');
+      await this.patternRecognition.initialize();
+
       console.log('✅ All ADK agents initialized successfully');
     } catch (error) {
       console.error('❌ Error initializing agents:', error);
@@ -465,6 +473,16 @@ class IrisWorkflowOrchestrator {
         this.isRunning = true;
         console.log('✅ ADK Workflow execution completed successfully');
         console.log('📊 Workflow Results:', result);
+
+        // Process advanced pattern recognition
+        console.log('🔍 Processing advanced pattern recognition...');
+        try {
+          const patternResult = await this.patternRecognition.analyzeAllPatterns();
+          console.log('✅ Advanced pattern recognition completed:', patternResult);
+        } catch (patternError) {
+          console.error('❌ Pattern recognition failed:', patternError);
+          // Don't fail the entire workflow for pattern errors
+        }
 
         // Process real-time decisions after data collection
         console.log('🧠 Processing real-time decisions...');
@@ -687,6 +705,17 @@ class IrisWorkflowOrchestrator {
       this.isRunning = true;
       console.log('✅ Individual agent execution completed successfully');
       console.log('📊 Individual Results:', results);
+
+      // Process advanced pattern recognition
+      console.log('🔍 Processing advanced pattern recognition...');
+      try {
+        const patternResult = await this.patternRecognition.analyzeAllPatterns();
+        console.log('✅ Advanced pattern recognition completed:', patternResult);
+        results.patterns = patternResult;
+      } catch (patternError) {
+        console.error('❌ Pattern recognition failed:', patternError);
+        results.patterns = { success: false, error: patternError.message };
+      }
 
       // Process real-time decisions after data collection
       console.log('🧠 Processing real-time decisions...');

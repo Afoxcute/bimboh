@@ -38,7 +38,10 @@
     "migrate-twitter": "node migrate_to_intelligent_twitter.mjs",
     "setup-decision-schema": "echo 'Run decision_schema.sql in your Supabase SQL Editor'",
     "test-decision-agent": "node test_decision_agent.mjs",
-    "decision-agent": "node realtime_decision_agent.mjs"
+    "decision-agent": "node realtime_decision_agent.mjs",
+    "setup-pattern-schema": "echo 'Run pattern_recognition_schema.sql in your Supabase SQL Editor'",
+    "test-pattern-recognition": "node test_pattern_recognition.mjs",
+    "pattern-recognition": "node advanced_pattern_recognition.mjs"
   },
   "dependencies": {
     "@iqai/adk": "^0.3.6",
