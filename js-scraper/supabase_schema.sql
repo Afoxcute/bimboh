@@ -179,7 +179,7 @@ CREATE INDEX IF NOT EXISTS idx_mentions_sentiment ON mentions(sentiment);
 CREATE TABLE IF NOT EXISTS prices (
     id SERIAL PRIMARY KEY,
     token_id INTEGER REFERENCES tokens(id) ON DELETE CASCADE,
-    token_uri TEXT REFERENCES tokens(uri) ON DELETE CASCADE,
+    token_uri TEXT,
     price_usd DECIMAL(20,8),
     price_sol DECIMAL(20,8),
     trade_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -190,6 +190,10 @@ CREATE TABLE IF NOT EXISTS prices (
     price_change_24h DECIMAL(10,4),
     metadata JSONB DEFAULT '{}'::jsonb
 );
+
+-- Add foreign key constraint with explicit name
+ALTER TABLE prices ADD CONSTRAINT fk_prices_token_uri 
+FOREIGN KEY (token_uri) REFERENCES tokens(uri) ON DELETE CASCADE;
 
 -- Create indexes for prices
 CREATE INDEX IF NOT EXISTS idx_prices_token_id ON prices(token_id);
