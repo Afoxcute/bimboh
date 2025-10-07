@@ -341,7 +341,7 @@ ORDER BY prediction_count DESC;
 
 -- Function to calculate pattern accuracy
 CREATE OR REPLACE FUNCTION calculate_pattern_accuracy(
-    pattern_type TEXT,
+    input_pattern_type TEXT,
     days_back INTEGER DEFAULT 7
 )
 RETURNS TABLE (
@@ -361,7 +361,7 @@ BEGIN
             NULLIF(COUNT(*), 0) * 100, 4
         ) / 100 as accuracy_rate
     FROM pattern_predictions pp
-    WHERE pp.prediction_type = pattern_type
+    WHERE pp.prediction_type = input_pattern_type
     AND pp.created_at >= NOW() - (days_back || ' days')::INTERVAL
     GROUP BY pp.prediction_type;
 END;
