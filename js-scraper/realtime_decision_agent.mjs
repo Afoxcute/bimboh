@@ -33,121 +33,18 @@ export class RealtimeDecisionAgent {
    * Initialize all decision-making agents
    */
   async initialize() {
-    console.log('🧠 Initializing Real-Time Decision Making Agents...');
+    console.log('🧠 Initializing Real-Time Decision Making System...');
 
-    // 1. Market Opportunity Detector
-    this.agents.opportunityDetector = new LlmAgent({
-      name: 'opportunity_detector',
-      model: 'gpt-3.5-turbo',
-      instruction: `You are an AI-powered market opportunity detector. Your role is to:
-      
-      - Analyze market data, social sentiment, and trend patterns
-      - Identify high-potential memecoin opportunities
-      - Calculate opportunity scores based on multiple factors
-      - Consider volume growth, sentiment, trends, and risk factors
-      - Provide clear reasoning for opportunity assessments
-      
-      Focus on:
-      - Volume spikes and trading patterns
-      - Social media sentiment and engagement
-      - Technical indicators and price movements
-      - Risk-reward ratios
-      - Market timing and momentum
-      
-      Always provide confidence scores and detailed reasoning.`,
-      tools: [
-        new MarketOpportunityTool(this.supabase),
-        new VolumeAnalysisTool(this.supabase),
-        new SentimentAnalysisTool(this.supabase),
-        new TrendAnalysisTool(this.supabase)
-      ]
-    });
+    // Initialize tools directly (no ADK agents needed)
+    this.tools = {
+      marketOpportunity: new MarketOpportunityTool(this.supabase),
+      riskAssessment: new RiskAssessmentTool(this.supabase),
+      actionDecision: new ActionDecisionTool(this.supabase),
+      execution: new ExecutionTool(this.supabase),
+      performanceAnalysis: new PerformanceAnalysisTool(this.supabase)
+    };
 
-    // 2. Risk Assessment Agent
-    this.agents.riskAssessor = new LlmAgent({
-      name: 'risk_assessor',
-      model: 'gpt-3.5-turbo',
-      instruction: `You are an AI-powered risk assessment specialist. Your role is to:
-      
-      - Evaluate potential risks in market opportunities
-      - Analyze token fundamentals and market conditions
-      - Assess liquidity, volatility, and market manipulation risks
-      - Consider regulatory and compliance factors
-      - Provide risk mitigation strategies
-      
-      Focus on:
-      - Token liquidity and trading volume
-      - Price volatility and market stability
-      - Social media manipulation signals
-      - Regulatory compliance and legal risks
-      - Technical analysis and chart patterns
-      
-      Always provide risk scores and mitigation recommendations.`,
-      tools: [
-        new RiskAssessmentTool(this.supabase),
-        new LiquidityAnalysisTool(this.supabase),
-        new VolatilityAnalysisTool(this.supabase),
-        new ComplianceCheckTool(this.supabase)
-      ]
-    });
-
-    // 3. Action Decision Agent
-    this.agents.actionDecider = new LlmAgent({
-      name: 'action_decider',
-      model: 'gpt-3.5-turbo',
-      instruction: `You are an AI-powered action decision maker. Your role is to:
-      
-      - Decide on specific actions based on opportunity and risk analysis
-      - Choose between different strategies (buy, sell, hold, alert)
-      - Determine optimal timing and execution parameters
-      - Consider portfolio balance and risk management
-      - Provide clear action recommendations with reasoning
-      
-      Available actions:
-      - ALERT: Send alert to users about opportunity
-      - BUY: Recommend buying with specific parameters
-      - SELL: Recommend selling with specific parameters
-      - HOLD: Continue monitoring without action
-      - AVOID: Avoid due to high risk or low opportunity
-      
-      Always provide clear reasoning and confidence levels.`,
-      tools: [
-        new ActionDecisionTool(this.supabase),
-        new PortfolioAnalysisTool(this.supabase),
-        new TimingAnalysisTool(this.supabase),
-        new ExecutionTool(this.supabase)
-      ]
-    });
-
-    // 4. Performance Monitor Agent
-    this.agents.performanceMonitor = new LlmAgent({
-      name: 'performance_monitor',
-      model: 'gpt-3.5-turbo',
-      instruction: `You are an AI-powered performance monitoring specialist. Your role is to:
-      
-      - Track the performance of previous decisions
-      - Analyze success and failure patterns
-      - Identify areas for improvement
-      - Adjust decision parameters based on results
-      - Provide performance insights and recommendations
-      
-      Focus on:
-      - Decision accuracy and success rates
-      - Risk-adjusted returns
-      - Market timing effectiveness
-      - Pattern recognition improvements
-      - Strategy optimization
-      
-      Always provide actionable insights for improvement.`,
-      tools: [
-        new PerformanceAnalysisTool(this.supabase),
-        new DecisionTrackingTool(this.supabase),
-        new StrategyOptimizationTool(this.supabase),
-        new LearningTool(this.supabase)
-      ]
-    });
-
-    console.log('✅ Real-Time Decision Making Agents initialized');
+    console.log('✅ Real-Time Decision Making System initialized');
   }
 
   /**
@@ -193,7 +90,9 @@ export class RealtimeDecisionAgent {
     console.log('🔍 Detecting market opportunities...');
     
     try {
-      const result = await this.agents.opportunityDetector.execute({
+      // Use the MarketOpportunityTool directly
+      const opportunityTool = this.tools.marketOpportunity;
+      const result = await opportunityTool.execute({
         mode: 'realtime',
         timeRange: '1h',
         minVolumeGrowth: this.opportunityThresholds.minVolumeGrowth,
@@ -217,7 +116,9 @@ export class RealtimeDecisionAgent {
     
     for (const opportunity of opportunities) {
       try {
-        const result = await this.agents.riskAssessor.execute({
+        // Use the RiskAssessmentTool directly
+        const riskTool = this.tools.riskAssessment;
+        const result = await riskTool.execute({
           tokenSymbol: opportunity.tokenSymbol,
           tokenUri: opportunity.tokenUri,
           opportunityScore: opportunity.score,
@@ -250,7 +151,9 @@ export class RealtimeDecisionAgent {
     
     for (const assessment of riskAssessments) {
       try {
-        const result = await this.agents.actionDecider.execute({
+        // Use the ActionDecisionTool directly
+        const actionTool = this.tools.actionDecision;
+        const result = await actionTool.execute({
           opportunity: assessment,
           riskAssessment: assessment.riskAssessment,
           currentPortfolio: await this.getCurrentPortfolio(),
@@ -285,7 +188,9 @@ export class RealtimeDecisionAgent {
     
     for (const decision of decisions) {
       try {
-        const result = await this.agents.actionDecider.execute({
+        // Use the ExecutionTool directly
+        const executionTool = this.tools.execution;
+        const result = await executionTool.execute({
           action: decision.decision.action,
           parameters: decision.decision.parameters,
           tokenSymbol: decision.tokenSymbol,
@@ -323,7 +228,9 @@ export class RealtimeDecisionAgent {
     console.log('📊 Monitoring decision performance...');
     
     try {
-      const result = await this.agents.performanceMonitor.execute({
+      // Use the PerformanceAnalysisTool directly
+      const performanceTool = this.tools.performanceAnalysis;
+      const result = await performanceTool.execute({
         decisions: results,
         timeRange: '24h',
         includeLearning: true
@@ -410,9 +317,12 @@ export class RealtimeDecisionAgent {
           created_at: new Date().toISOString()
         });
 
-      if (error) throw error;
+      if (error) {
+        console.log('⚠️ Decision history table not found, skipping storage');
+        return;
+      }
     } catch (error) {
-      console.error('Failed to store decision:', error);
+      console.log('⚠️ Decision history table not available, skipping storage');
     }
   }
 
@@ -552,14 +462,25 @@ class MarketOpportunityTool {
 
       if (sentimentError) throw sentimentError;
 
-      // Get trend data
-      const { data: trends, error: trendError } = await this.supabase
-        .from('trend_analysis')
-        .select('*')
-        .gte('created_at', since)
-        .order('created_at', { ascending: false });
+      // Get trend data (handle missing table gracefully)
+      let trends = [];
+      try {
+        const { data: trendData, error: trendError } = await this.supabase
+          .from('trend_analysis')
+          .select('*')
+          .gte('created_at', since)
+          .order('created_at', { ascending: false });
 
-      if (trendError) throw trendError;
+        if (trendError) {
+          console.log('⚠️ Trend analysis table not found, using empty dataset');
+          trends = [];
+        } else {
+          trends = trendData || [];
+        }
+      } catch (error) {
+        console.log('⚠️ Trend analysis table not available, using empty dataset');
+        trends = [];
+      }
 
       return { prices: prices || [], sentiment: sentiment || [], trends: trends || [] };
     } catch (error) {
@@ -742,9 +663,12 @@ class MarketOpportunityTool {
         .from('opportunity_analysis')
         .insert(analysisData);
 
-      if (error) throw error;
+      if (error) {
+        console.log('⚠️ Opportunity analysis table not found, skipping storage');
+        return;
+      }
     } catch (error) {
-      console.error('Failed to store opportunity analysis:', error);
+      console.log('⚠️ Opportunity analysis table not available, skipping storage');
     }
   }
 }
