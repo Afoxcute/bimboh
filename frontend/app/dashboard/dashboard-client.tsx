@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import RealTimeData from '@/components/dashboard/real-time-data';
 import TrendingCoinsSummary from '@/components/dashboard/trending-coins-summary';
 import TrendingCoinsAnalytics from '@/components/dashboard/trending-coins-analytics';
+import { PatternRecognitionCard } from '@/components/dashboard/pattern-recognition-card';
+import { BackendServicesCard } from '@/components/dashboard/backend-services-card';
 import ErrorBoundary from '@/components/dashboard/error-boundary';
 
 export default function DashboardClient() {
@@ -86,6 +88,26 @@ export default function DashboardClient() {
       <ErrorBoundary>
         <RealTimeData />
       </ErrorBoundary>
+
+      {/* AI-Powered Features */}
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-2xl font-bold mb-4">🤖 AI-Powered Features</h2>
+          <p className="text-muted-foreground">
+            Advanced pattern recognition, decision making, and backend service management
+          </p>
+        </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <ErrorBoundary>
+            <PatternRecognitionCard />
+          </ErrorBoundary>
+          
+          <ErrorBoundary>
+            <BackendServicesCard />
+          </ErrorBoundary>
+        </div>
+      </div>
 
       {/* Trending Coins Analytics */}
       <div className="space-y-6">

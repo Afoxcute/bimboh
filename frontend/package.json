@@ -11,7 +11,9 @@
     "populate-sample": "node populate-sample-data.mjs",
     "test-tiktok": "node test-tiktok-api.mjs",
     "add-tweets-table": "node add-tweets-table.mjs",
-    "add-missing-columns": "node add-missing-columns.mjs"
+    "add-missing-columns": "node add-missing-columns.mjs",
+    "test-backend-integration": "node -e \"console.log('Testing backend integration...'); import('./lib/services/backend-integration-service.ts').then(() => console.log('Backend integration service loaded successfully'));\"",
+    "test-pattern-service": "node -e \"console.log('Testing pattern recognition service...'); import('./lib/services/pattern-recognition-service.ts').then(() => console.log('Pattern recognition service loaded successfully'));\""
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.2",
