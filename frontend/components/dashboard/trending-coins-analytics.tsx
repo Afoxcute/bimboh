@@ -118,9 +118,21 @@ export default function TrendingCoinsAnalytics() {
     return 'destructive';
   };
 
-  // Filtered and searched data
+  // Filtered and searched data - Remove coins with all zero values
   const filteredCoins = useMemo(() => {
     let filtered = [...data.coins];
+
+    // First, remove coins with all zero values (no meaningful data)
+    filtered = filtered.filter(coin => {
+      const hasVolume = (coin.trading_volume_24h || 0) > 0;
+      const hasViews = (coin.tiktok_views_24h || 0) > 0;
+      const hasCorrelation = (coin.correlation_score || 0) > 0;
+      const hasMarketCap = (coin.market_cap || 0) > 0;
+      const hasMentions = (coin.total_mentions || 0) > 0;
+      
+      // Keep coin if it has at least one meaningful metric
+      return hasVolume || hasViews || hasCorrelation || hasMarketCap || hasMentions;
+    });
 
     // Search filter
     if (searchQuery.trim()) {
@@ -217,6 +229,46 @@ export default function TrendingCoinsAnalytics() {
                 </div>
               </div>
             ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Show "no data" state when there are no coins
+  if (!isLoading && data.coins.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Trending Coins Analytics</CardTitle>
+          <CardDescription>No trending coins data available</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-12">
+            <div className="w-16 h-16 bg-muted/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-2xl">📈</span>
+            </div>
+            <h3 className="text-lg font-semibold text-foreground mb-2">No Trending Coins Found</h3>
+            <p className="text-muted-foreground text-sm mb-4">
+              No trending coins data is currently available. This could be because:
+            </p>
+            <ul className="text-xs text-muted-foreground space-y-1 text-left max-w-md mx-auto mb-6">
+              <li>• The database is not populated with token data</li>
+              <li>• Price data collection is not running</li>
+              <li>• TikTok scraper is not collecting data</li>
+              <li>• No recent activity in the last 24 hours</li>
+            </ul>
+            <div className="space-y-2">
+              <p className="text-xs text-muted-foreground">
+                To start seeing trending coins data:
+              </p>
+              <ul className="text-xs text-muted-foreground space-y-1">
+                <li>• Run the Bitquery data collection service</li>
+                <li>• Start the TikTok scraper</li>
+                <li>• Ensure database tables are populated</li>
+                <li>• Check that all services are running</li>
+              </ul>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -433,10 +485,12 @@ export default function TrendingCoinsAnalytics() {
                     </div>
                     <div>
                         <h3 className="font-semibold">{coin.symbol}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Volume: {formatCurrency(coin.trading_volume_24h)}
-                      </p>
-                      {coin.market_cap && (
+                      {(coin.trading_volume_24h || 0) > 0 && (
+                        <p className="text-sm text-muted-foreground">
+                          Volume: {formatCurrency(coin.trading_volume_24h)}
+                        </p>
+                      )}
+                      {coin.market_cap && coin.market_cap > 0 && (
                         <p className="text-xs text-muted-foreground">
                           Market Cap: {formatCurrency(coin.market_cap)}
                         </p>
@@ -444,18 +498,22 @@ export default function TrendingCoinsAnalytics() {
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
-                    <div className="text-right">
-                      <p className="text-sm font-medium">Correlation</p>
-                      <p className={`text-lg font-bold ${getCorrelationColor(coin.correlation_score)}`}>
-                        {formatCorrelation(coin.correlation_score)}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-medium">Views</p>
-                      <p className="text-lg font-bold text-blue-600">
-                        {formatViews(coin.tiktok_views_24h)}
-                      </p>
-                    </div>
+                    {(coin.correlation_score || 0) > 0 && (
+                      <div className="text-right">
+                        <p className="text-sm font-medium">Correlation</p>
+                        <p className={`text-lg font-bold ${getCorrelationColor(coin.correlation_score)}`}>
+                          {formatCorrelation(coin.correlation_score)}
+                        </p>
+                      </div>
+                    )}
+                    {(coin.tiktok_views_24h || 0) > 0 && (
+                      <div className="text-right">
+                        <p className="text-sm font-medium">Views</p>
+                        <p className="text-lg font-bold text-blue-600">
+                          {formatViews(coin.tiktok_views_24h)}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -475,10 +533,12 @@ export default function TrendingCoinsAnalytics() {
                       </div>
                         <div>
                           <h3 className="font-semibold">{coin.symbol}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Volume: {formatCurrency(coin.trading_volume_24h)}
-                        </p>
-                        {coin.market_cap && (
+                        {(coin.trading_volume_24h || 0) > 0 && (
+                          <p className="text-sm text-muted-foreground">
+                            Volume: {formatCurrency(coin.trading_volume_24h)}
+                          </p>
+                        )}
+                        {coin.market_cap && coin.market_cap > 0 && (
                           <p className="text-xs text-muted-foreground">
                             Market Cap: {formatCurrency(coin.market_cap)}
                           </p>
@@ -486,15 +546,19 @@ export default function TrendingCoinsAnalytics() {
                       </div>
                     </div>
                     <div className="flex items-center gap-4">
-                      <Badge variant={getCorrelationBadgeVariant(coin.correlation_score)}>
-                        {formatCorrelation(coin.correlation_score)}
-                      </Badge>
-                      <div className="text-right">
-                        <p className="text-sm font-medium">Views</p>
-                        <p className="text-lg font-bold text-blue-600">
-                          {formatViews(coin.tiktok_views_24h)}
-                        </p>
-                      </div>
+                      {(coin.correlation_score || 0) > 0 && (
+                        <Badge variant={getCorrelationBadgeVariant(coin.correlation_score)}>
+                          {formatCorrelation(coin.correlation_score)}
+                        </Badge>
+                      )}
+                      {(coin.tiktok_views_24h || 0) > 0 && (
+                        <div className="text-right">
+                          <p className="text-sm font-medium">Views</p>
+                          <p className="text-lg font-bold text-blue-600">
+                            {formatViews(coin.tiktok_views_24h)}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -514,10 +578,12 @@ export default function TrendingCoinsAnalytics() {
                       </div>
                         <div>
                           <h3 className="font-semibold">{coin.symbol}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Correlation: {formatCorrelation(coin.correlation_score)}
-                        </p>
-                        {coin.market_cap && (
+                        {(coin.correlation_score || 0) > 0 && (
+                          <p className="text-sm text-muted-foreground">
+                            Correlation: {formatCorrelation(coin.correlation_score)}
+                          </p>
+                        )}
+                        {coin.market_cap && coin.market_cap > 0 && (
                           <p className="text-xs text-muted-foreground">
                             Market Cap: {formatCurrency(coin.market_cap)}
                           </p>
@@ -525,18 +591,22 @@ export default function TrendingCoinsAnalytics() {
                       </div>
                         </div>
                     <div className="flex items-center gap-4">
-                      <div className="text-right">
-                        <p className="text-sm font-medium">Views</p>
-                        <p className="text-lg font-bold text-blue-600">
-                          {formatViews(coin.tiktok_views_24h)}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm font-medium">Mentions</p>
-                        <p className="text-lg font-bold text-purple-600">
-                          {coin.total_mentions || 0}
-                        </p>
-                      </div>
+                      {(coin.tiktok_views_24h || 0) > 0 && (
+                        <div className="text-right">
+                          <p className="text-sm font-medium">Views</p>
+                          <p className="text-lg font-bold text-blue-600">
+                            {formatViews(coin.tiktok_views_24h)}
+                          </p>
+                        </div>
+                      )}
+                      {(coin.total_mentions || 0) > 0 && (
+                        <div className="text-right">
+                          <p className="text-sm font-medium">Mentions</p>
+                          <p className="text-lg font-bold text-purple-600">
+                            {coin.total_mentions}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -568,7 +638,7 @@ export default function TrendingCoinsAnalytics() {
                       </div>
                     </div>
                     <div className="flex items-center gap-4">
-                      {coin.market_cap && (
+                      {coin.market_cap && coin.market_cap > 0 && (
                         <div className="text-right">
                           <p className="text-sm font-medium">Market Cap</p>
                           <p className="text-lg font-bold text-purple-600">
@@ -576,7 +646,7 @@ export default function TrendingCoinsAnalytics() {
                           </p>
                         </div>
                       )}
-                      {coin.total_supply && (
+                      {coin.total_supply && coin.total_supply > 0 && (
                         <div className="text-right">
                           <p className="text-sm font-medium">Total Supply</p>
                           <p className="text-lg font-bold text-orange-600">
@@ -584,12 +654,14 @@ export default function TrendingCoinsAnalytics() {
                           </p>
                         </div>
                       )}
-                      <div className="text-right">
-                        <p className="text-sm font-medium">Last Updated</p>
-                        <p className="text-xs text-muted-foreground">
-                          {coin.last_updated ? new Date(coin.last_updated).toLocaleDateString() : 'Unknown'}
-                        </p>
-                      </div>
+                      {coin.last_updated && (
+                        <div className="text-right">
+                          <p className="text-sm font-medium">Last Updated</p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(coin.last_updated).toLocaleDateString()}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
