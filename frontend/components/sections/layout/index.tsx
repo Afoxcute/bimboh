@@ -64,13 +64,13 @@ export default function Layout({
         >
           <Image
             src="/iris.jpg"
-            alt="Iris Logo"
+            alt="Bimboh Logo"
             width={40}
             height={40}
             className="rounded-full"
           />
           <p className="font-bold text-lg sm:text-2xl crypto-futuristic tracking-widest text-iris-primary">
-            Iris
+            Bimboh
           </p>
         </div>
 

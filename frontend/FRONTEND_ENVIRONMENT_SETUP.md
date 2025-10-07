@@ -2,7 +2,7 @@
 
 ## Required Environment Variables
 
-To run the Iris frontend application, you need to set up the following environment variables:
+To run the Bimboh frontend application, you need to set up the following environment variables:
 
 ### 1. Supabase Configuration (Required)
 ```bash

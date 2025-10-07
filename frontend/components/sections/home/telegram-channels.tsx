@@ -32,6 +32,7 @@ export default function TelegramChannelsHome() {
   const [refreshing, setRefreshing] = useState(false);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [isClient, setIsClient] = useState(false);
+  const [visibleChannels, setVisibleChannels] = useState(12);
   const [connectionStatus, setConnectionStatus] = useState({
     isConnected: false,
     isConnecting: false,
@@ -157,6 +158,11 @@ export default function TelegramChannelsHome() {
     return matchesSearch && matchesStatus;
   }) || [];
 
+  // Reset visible channels when filters change
+  useEffect(() => {
+    setVisibleChannels(12);
+  }, [searchTerm, statusFilter]);
+
   const formatLastMessage = (lastMessageAt: string | null) => {
     if (!lastMessageAt) return 'No messages';
     
@@ -190,6 +196,10 @@ export default function TelegramChannelsHome() {
     if (connectionStatus.isConnected) return '● Live';
     if (connectionStatus.isConnecting) return '● Connecting';
     return '● Disconnected';
+  };
+
+  const handleLoadMore = () => {
+    setVisibleChannels(prev => prev + 12);
   };
 
   // Don't render until client-side
@@ -323,7 +333,7 @@ export default function TelegramChannelsHome() {
       {/* Channels Grid */}
       {!loading && filteredChannels.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 w-full">
-          {filteredChannels.slice(0, 12).map((channel) => (
+          {filteredChannels.slice(0, visibleChannels).map((channel) => (
             <Card
               key={channel.id}
               className="bg-card/50 backdrop-blur-sm border-border/50 hover:border-iris-primary/50 transition-all duration-300 hover:scale-105 w-full min-w-0"
@@ -428,10 +438,14 @@ export default function TelegramChannelsHome() {
       )}
 
       {/* Load More */}
-      {!loading && filteredChannels.length > 12 && (
+      {!loading && filteredChannels.length > visibleChannels && (
         <div className="text-center mt-8">
-          <Button variant="outline" className="border-iris-primary/30 text-iris-primary">
-            Load More Channels
+          <Button 
+            onClick={handleLoadMore}
+            variant="outline" 
+            className="border-iris-primary/30 text-iris-primary hover:bg-iris-primary/10"
+          >
+            Load More Channels ({filteredChannels.length - visibleChannels} remaining)
           </Button>
         </div>
       )}

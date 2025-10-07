@@ -59,7 +59,7 @@ export default function Home() {
       
       {!paid && (
         <div className="mb-8 sm:mb-12 lg:mb-16">
-          <UnlockNow text="Unlock All Iris features now" />
+          <UnlockNow text="Unlock All Bimboh features now" />
         </div>
       )}
       

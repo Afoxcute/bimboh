@@ -277,7 +277,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 **The integration is complete and ready for production use!**
 
-Your Iris memecoin hunting platform now has:
+Your Bimboh memecoin hunting platform now has:
 - **Full Frontend-Backend Integration** ✅
 - **Real-Time Pattern Recognition** ✅
 - **AI-Powered Decision Making** ✅

@@ -65,7 +65,7 @@ export default function UnlockNow({ text }: { text: string }) {
               setPaid(true);
               toast({
                 title: "Payment Successful",
-                description: "You have unlocked Iris Paid Tier.",
+                description: "You have unlocked Bimboh Paid Tier.",
               });
             }
           } else setPaid(true);

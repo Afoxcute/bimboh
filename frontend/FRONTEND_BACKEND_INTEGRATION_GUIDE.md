@@ -287,7 +287,7 @@ curl http://localhost:3000/api/patterns/summary
 - ✅ Decision making tools
 - ✅ Comprehensive error handling
 
-**Your Iris memecoin hunting platform now has a fully integrated frontend with all backend capabilities!** 🚀
+**Your Bimboh memecoin hunting platform now has a fully integrated frontend with all backend capabilities!** 🚀
 
 ## 📚 **Documentation Files**
 
