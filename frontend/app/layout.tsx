@@ -3,7 +3,19 @@ import localFont from "next/font/local";
 import "@solana/wallet-adapter-react-ui/styles.css";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
-import SSRSafeProvider from "@/components/providers/ssr-safe-provider";
+import dynamic from 'next/dynamic';
+
+const SSRSafeProvider = dynamic(() => import("@/components/providers/ssr-safe-provider"), {
+  ssr: false,
+  loading: () => (
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="text-center">
+        <div className="w-16 h-16 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin mx-auto mb-4"></div>
+        <p className="text-muted-foreground">Loading Bimboh...</p>
+      </div>
+    </div>
+  )
+});
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
