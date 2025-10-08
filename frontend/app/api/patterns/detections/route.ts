@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
+export const dynamic = 'force-dynamic';
+
 const getSupabaseClient = () => {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     return null;
@@ -13,11 +15,11 @@ const getSupabaseClient = () => {
 
 export async function GET(request: NextRequest): Promise<Response> {
   try {
-    const { searchParams } = new URL(request.url);
-    const limit = parseInt(searchParams.get('limit') || '50');
-    const patternType = searchParams.get('pattern_type');
-    const tokenSymbol = searchParams.get('token_symbol');
-    const hours = parseInt(searchParams.get('hours') || '24');
+    const url = new URL(request.url);
+    const limit = parseInt(url.searchParams.get('limit') || '50');
+    const patternType = url.searchParams.get('pattern_type');
+    const tokenSymbol = url.searchParams.get('token_symbol');
+    const hours = parseInt(url.searchParams.get('hours') || '24');
 
     console.log('🔍 Fetching pattern detections...');
 

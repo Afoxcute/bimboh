@@ -7,6 +7,7 @@ import Layout from "@/components/sections/layout";
 import { EnvironmentStoreProvider } from "@/components/context";
 import { Toaster } from "@/components/ui/toaster";
 import SolanaWalletProvider from "@/components/providers/wallet-provider";
+import ClientOnly from "@/components/providers/client-only-provider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -20,6 +21,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://bimboh.vercel.app'),
   title: "Bimboh | World's Best Memecoin Hunter",
   description: "An autonomous AI agent that hunts for new memecoins in Tiktok.",
   icons: {
@@ -66,24 +68,26 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <EnvironmentStoreProvider>
-      <html lang="en">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          forcedTheme="dark"
-          disableTransitionOnChange
-        >
-          <SolanaWalletProvider>
-            <body
-              className={`${geistSans.variable} ${geistMono.variable} antialiased select-none`}
-            >
-              <Layout>{children}</Layout>
-              <Toaster />
-            </body>
-          </SolanaWalletProvider>
-        </ThemeProvider>
-      </html>
-    </EnvironmentStoreProvider>
+    <html lang="en">
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="dark"
+        forcedTheme="dark"
+        disableTransitionOnChange
+      >
+        <ClientOnly>
+          <EnvironmentStoreProvider>
+            <SolanaWalletProvider>
+              <body
+                className={`${geistSans.variable} ${geistMono.variable} antialiased select-none`}
+              >
+                <Layout>{children}</Layout>
+                <Toaster />
+              </body>
+            </SolanaWalletProvider>
+          </EnvironmentStoreProvider>
+        </ClientOnly>
+      </ThemeProvider>
+    </html>
   );
 }
