@@ -1,6 +1,8 @@
-import dynamic from 'next/dynamic';
+export const dynamic = 'force-dynamic';
 
-const DashboardClient = dynamic(() => import('./dashboard-client'), {
+import dynamicImport from 'next/dynamic';
+
+const DashboardClient = dynamicImport(() => import('./dashboard-client'), {
   ssr: false,
   loading: () => (
     <div className="container mx-auto p-6 space-y-6">

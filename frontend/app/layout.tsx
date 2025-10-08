@@ -69,25 +69,25 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="dark"
-        forcedTheme="dark"
-        disableTransitionOnChange
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased select-none`}
       >
-        <ClientOnly>
-          <EnvironmentStoreProvider>
-            <SolanaWalletProvider>
-              <body
-                className={`${geistSans.variable} ${geistMono.variable} antialiased select-none`}
-              >
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          forcedTheme="dark"
+          disableTransitionOnChange
+        >
+          <ClientOnly>
+            <EnvironmentStoreProvider>
+              <SolanaWalletProvider>
                 <Layout>{children}</Layout>
                 <Toaster />
-              </body>
-            </SolanaWalletProvider>
-          </EnvironmentStoreProvider>
-        </ClientOnly>
-      </ThemeProvider>
+              </SolanaWalletProvider>
+            </EnvironmentStoreProvider>
+          </ClientOnly>
+        </ThemeProvider>
+      </body>
     </html>
   );
 }

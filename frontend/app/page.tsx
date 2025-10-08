@@ -1,6 +1,8 @@
-import dynamic from 'next/dynamic';
+export const dynamic = 'force-dynamic';
 
-const Home = dynamic(() => import("@/components/sections/home"), {
+import dynamicImport from 'next/dynamic';
+
+const Home = dynamicImport(() => import("@/components/sections/home"), {
   ssr: false,
   loading: () => (
     <div className="w-full max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
