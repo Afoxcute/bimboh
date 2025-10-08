@@ -1,8 +1,9 @@
+export const dynamic = 'force-dynamic';
+
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 import { TrendingCoin } from '@/lib/types';
 
-export const dynamic = 'force-dynamic';
 
 const supabase = createClient(
   process.env.SUPABASE_URL || 'https://srsapzqvwxgrohisrwnm.supabase.co',

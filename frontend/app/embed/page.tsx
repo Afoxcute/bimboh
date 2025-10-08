@@ -1,6 +1,4 @@
-export const metadata = {
-  title: "Embedded Content",
-};
+'use client';
 
 export default function EmbedPage() {
   return (

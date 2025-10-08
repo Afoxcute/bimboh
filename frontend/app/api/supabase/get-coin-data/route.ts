@@ -1,9 +1,10 @@
+export const dynamic = 'force-dynamic';
+
 import { toZonedTime } from "date-fns-tz";
 import { Price, TokenData } from "../../../../lib/types";
 import { createClient } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
 
-export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {

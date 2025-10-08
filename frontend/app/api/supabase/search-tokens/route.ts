@@ -1,9 +1,10 @@
+export const dynamic = 'force-dynamic';
+
 import { IPFS_GATEWAY_URL, ITEMS_PER_PAGE } from "@/lib/constants";
 import { SearchTokenResponse } from "@/lib/types";
 import { createClient } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
 
-export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   const requestId = Math.random().toString(36).substring(2, 15); // Generate a unique request ID for tracking

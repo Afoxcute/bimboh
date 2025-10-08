@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { getQuery } from "@/lib/utils";
 import { createClient } from "@supabase/supabase-js";
 import axios from "axios";
@@ -14,7 +16,6 @@ if (!BITQUERY_API_KEY || !ACCESS_TOKEN) {
   console.warn("   Price updates will be limited to existing data only");
 }
 
-export const dynamic = 'force-dynamic';
 
 // Helper function to clean up duplicate is_latest flags
 async function cleanupDuplicateLatestFlags(supabase: any, tokenId: number) {

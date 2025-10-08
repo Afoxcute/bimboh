@@ -1,9 +1,10 @@
+export const dynamic = 'force-dynamic';
+
 import { ITEMS_PER_PAGE } from "@/lib/constants";
 import { toZonedTime } from "date-fns-tz";
 import { createClient } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
 
-export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
