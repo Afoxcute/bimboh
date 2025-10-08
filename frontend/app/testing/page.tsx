@@ -1,7 +1,5 @@
 "use client";
 
-export const dynamic = 'force-dynamic';
-
 import React, { useEffect, useRef, useState } from "react";
 import { createChart, Time } from "lightweight-charts";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";

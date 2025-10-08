@@ -31,10 +31,12 @@ export const useEnvironmentStore = <T,>(
   selector: (store: EnvironmentStore) => T
 ): T => {
   const environmentStoreContext = useContext(EnvironmentStoreContext);
+  
   if (!environmentStoreContext) {
     throw new Error(
       "useEnvironmentStore must be used within a EnvironmentStoreProvider"
     );
   }
+  
   return useStore(environmentStoreContext, selector);
 };

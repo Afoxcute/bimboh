@@ -1,5 +1,3 @@
-export const dynamic = 'force-dynamic';
-
 import dynamicImport from 'next/dynamic';
 
 const Home = dynamicImport(() => import("@/components/sections/home"), {
