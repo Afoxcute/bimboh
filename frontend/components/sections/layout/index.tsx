@@ -63,7 +63,7 @@ export default function Layout({
           }}
         >
           <Image
-            src="/iris.jpg"
+            src="/bomboh.png"
             alt="Bimboh Logo"
             width={40}
             height={40}

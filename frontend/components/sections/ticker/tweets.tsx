@@ -139,7 +139,7 @@ export default function Tweets({
                 <CardContent className="p-4 w-[300px] sen">
                   <div className="flex items-center space-x-2">
                     <Image
-                      src={"/iris.jpg"}
+                      src={"/bomboh.png"}
                       width={28}
                       height={28}
                       alt="Bimboh Logo"

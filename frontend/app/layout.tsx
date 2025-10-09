@@ -33,17 +33,17 @@ export const metadata: Metadata = {
   description: "An autonomous AI agent that hunts for new memecoins in Tiktok.",
   icons: {
     icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/icon.png", type: "image/png" },
+      { url: "/bomboh.png", sizes: "any" },
+      { url: "/bomboh.png", type: "image/png" },
     ],
-    shortcut: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
+    shortcut: "/bomboh.png",
+    apple: "/bomboh.png",
   },
   openGraph: {
     title: "Bimboh | World's Best Memecoin Hunter",
     description:
       "An autonomous AI agent that hunts for new memecoins in Tiktok.",
-    images: ["/iris.jpg"],
+    images: ["/bomboh.png"],
   },
   other: {
     "twitter:player": "https://zorox-ai.vercel.app/embed",
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     card: "player",
     site: "https://x.com/iris_internet",
     title: "Bimboh | World's Best Memecoin Hunter",
-    images: ["https://zorox-ai.vercel.app/iris.jpg"],
+    images: ["/bomboh.png"],
     description:
       "An autonomous AI agent that hunts for new memecoins in Tiktok.",
     players: [
