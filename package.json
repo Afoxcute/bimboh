@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "cd frontend && yarn install && yarn build",
+    "build": "yarn install && cd frontend && yarn install && yarn build",
     "start": "cd frontend && yarn start",
     "dev": "cd frontend && yarn dev",
     "install:frontend": "cd frontend && yarn install",
@@ -57,6 +57,8 @@
     "@types/node": "^24.7.0",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@typescript-eslint/eslint-plugin": "^8.46.0",
+    "@typescript-eslint/parser": "^8.46.0",
     "eslint": "^9.37.0",
     "eslint-config-next": "14.2.16",
     "pino-pretty": "^13.0.0",
