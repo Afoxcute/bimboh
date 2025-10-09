@@ -1,7 +1,7 @@
-# AGENTS.md - Iris Development Guide
+# AGENTS.md - Bimboh Development Guide
 
 ## Architecture
-Iris is a memecoin hunting platform with multi-component architecture:
+Bimboh is a memecoin hunting platform with multi-component architecture:
 - `frontend/` - Next.js app with ShadCN/UI, TypeScript, TailwindCSS, Solana wallet integration
 - `scraper/` - Python web scraper using Selenium for TikTok data collection  
 - `js-scraper/` - Node.js Puppeteer scraper for alternative TikTok scraping

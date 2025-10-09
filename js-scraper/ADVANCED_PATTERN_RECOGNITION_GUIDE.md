@@ -404,4 +404,4 @@ if (recommendations.thresholdAdjustments) {
 
 ---
 
-**The Advanced Pattern Recognition System transforms the Iris platform into an intelligent pattern detection and analysis system that can identify complex market patterns, generate insights, and make predictions automatically.** 🚀
+**The Advanced Pattern Recognition System transforms the Bimboh platform into an intelligent pattern detection and analysis system that can identify complex market patterns, generate insights, and make predictions automatically.** 🚀

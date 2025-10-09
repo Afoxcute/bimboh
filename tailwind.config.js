@@ -70,12 +70,12 @@ module.exports = {
           "5": "hsl(var(--chart-5))",
         },
         // Black & White Brand Colors
-        iris: {
-          primary: "hsl(var(--iris-primary))",
-          secondary: "hsl(var(--iris-secondary))",
-          accent: "hsl(var(--iris-accent))",
-          light: "hsl(var(--iris-light))",
-          dark: "hsl(var(--iris-dark))",
+        bimboh: {
+          primary: "hsl(var(--bimboh-primary))",
+          secondary: "hsl(var(--bimboh-secondary))",
+          accent: "hsl(var(--bimboh-accent))",
+          light: "hsl(var(--bimboh-light))",
+          dark: "hsl(var(--bimboh-dark))",
         },
       },
       borderRadius: {

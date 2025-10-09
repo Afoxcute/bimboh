@@ -68,67 +68,67 @@ body {
   }
 
   /* Bimboh Brand Color Utilities */
-  .iris-primary {
-    color: hsl(var(--iris-primary));
+  .bimboh-primary {
+    color: hsl(var(--bimboh-primary));
   }
   
-  .iris-secondary {
-    color: hsl(var(--iris-secondary));
+  .bimboh-secondary {
+    color: hsl(var(--bimboh-secondary));
   }
   
-  .iris-accent {
-    color: hsl(var(--iris-accent));
+  .bimboh-accent {
+    color: hsl(var(--bimboh-accent));
   }
   
-  .iris-light {
-    color: hsl(var(--iris-light));
+  .bimboh-light {
+    color: hsl(var(--bimboh-light));
   }
   
-  .iris-dark {
-    color: hsl(var(--iris-dark));
+  .bimboh-dark {
+    color: hsl(var(--bimboh-dark));
   }
   
-  .bg-iris-primary {
-    background-color: hsl(var(--iris-primary));
+  .bg-bimboh-primary {
+    background-color: hsl(var(--bimboh-primary));
   }
   
-  .bg-iris-secondary {
-    background-color: hsl(var(--iris-secondary));
+  .bg-bimboh-secondary {
+    background-color: hsl(var(--bimboh-secondary));
   }
   
-  .bg-iris-accent {
-    background-color: hsl(var(--iris-accent));
+  .bg-bimboh-accent {
+    background-color: hsl(var(--bimboh-accent));
   }
   
-  .bg-iris-light {
-    background-color: hsl(var(--iris-light));
+  .bg-bimboh-light {
+    background-color: hsl(var(--bimboh-light));
   }
   
-  .bg-iris-dark {
-    background-color: hsl(var(--iris-dark));
+  .bg-bimboh-dark {
+    background-color: hsl(var(--bimboh-dark));
   }
   
-  .border-iris-primary {
-    border-color: hsl(var(--iris-primary));
+  .border-bimboh-primary {
+    border-color: hsl(var(--bimboh-primary));
   }
   
-  .border-iris-secondary {
-    border-color: hsl(var(--iris-secondary));
+  .border-bimboh-secondary {
+    border-color: hsl(var(--bimboh-secondary));
   }
   
-  .border-iris-accent {
-    border-color: hsl(var(--iris-accent));
+  .border-bimboh-accent {
+    border-color: hsl(var(--bimboh-accent));
   }
 }
 
 @layer base {
   :root {
-    /* Black & White Brand Colors */
-    --iris-primary: 0 0% 0%;            /* Pure Black - Primary brand color */
-    --iris-secondary: 0 0% 50%;         /* Medium Gray - Secondary accent */
-    --iris-accent: 0 0% 20%;            /* Dark Gray - Accent color */
-    --iris-light: 0 0% 95%;             /* Very Light Gray - Backgrounds */
-    --iris-dark: 0 0% 10%;              /* Very Dark Gray - Text/contrast */
+        /* Black & White Brand Colors */
+        --bimboh-primary: 0 0% 0%;            /* Pure Black - Primary brand color */
+        --bimboh-secondary: 0 0% 50%;         /* Medium Gray - Secondary accent */
+        --bimboh-accent: 0 0% 20%;            /* Dark Gray - Accent color */
+        --bimboh-light: 0 0% 95%;             /* Very Light Gray - Backgrounds */
+        --bimboh-dark: 0 0% 10%;              /* Very Dark Gray - Text/contrast */
     
     /* System Colors */
     --background: 0 0% 100%;
@@ -158,12 +158,12 @@ body {
     --radius: 0.5rem;
   }
   .dark {
-    /* Black & White Brand Colors - Dark Mode */
-    --iris-primary: 0 0% 100%;          /* Pure White - Primary brand color */
-    --iris-secondary: 0 0% 50%;         /* Medium Gray - Secondary accent */
-    --iris-accent: 0 0% 80%;            /* Light Gray - Accent color */
-    --iris-light: 0 0% 5%;              /* Very Dark Gray - Dark backgrounds */
-    --iris-dark: 0 0% 90%;              /* Light Gray - Text/contrast */
+        /* Black & White Brand Colors - Dark Mode */
+        --bimboh-primary: 0 0% 100%;          /* Pure White - Primary brand color */
+        --bimboh-secondary: 0 0% 50%;         /* Medium Gray - Secondary accent */
+        --bimboh-accent: 0 0% 80%;            /* Light Gray - Accent color */
+        --bimboh-light: 0 0% 5%;              /* Very Dark Gray - Dark backgrounds */
+        --bimboh-dark: 0 0% 90%;              /* Light Gray - Text/contrast */
     
     /* System Colors - Dark Mode */
     --background: 0 0% 5%;

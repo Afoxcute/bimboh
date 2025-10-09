@@ -217,7 +217,7 @@ export default function TelegramChannelsHome() {
     return (
       <div className="w-full max-w-7xl mx-auto px-4 py-8">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-iris-primary/20 border-t-iris-primary rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-bimboh-primary/20 border-t-bimboh-primary rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-muted-foreground">Loading Telegram channels...</p>
         </div>
       </div>
@@ -252,7 +252,7 @@ export default function TelegramChannelsHome() {
             disabled={refreshing}
             variant="outline"
             size="sm"
-            className="border-iris-primary/30 text-iris-primary hover:bg-iris-primary/10 w-full sm:w-auto"
+            className="border-bimboh-primary/30 text-bimboh-primary hover:bg-bimboh-primary/10 w-full sm:w-auto"
           >
             <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
             {refreshing ? 'Refreshing...' : 'Refresh'}
@@ -265,7 +265,7 @@ export default function TelegramChannelsHome() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
           <Card className="bg-card/50 backdrop-blur-sm border-border/50">
             <CardContent className="p-3 sm:p-4 text-center">
-              <div className="text-lg sm:text-xl lg:text-2xl font-bold text-iris-primary">{data.summary.totalChannels}</div>
+              <div className="text-lg sm:text-xl lg:text-2xl font-bold text-bimboh-primary">{data.summary.totalChannels}</div>
               <div className="text-xs sm:text-sm text-muted-foreground">Total Channels</div>
             </CardContent>
           </Card>
@@ -335,7 +335,7 @@ export default function TelegramChannelsHome() {
       {/* Loading State */}
       {loading && (
         <div className="text-center py-12">
-          <div className="w-16 h-16 border-4 border-iris-primary/20 border-t-iris-primary rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-bimboh-primary/20 border-t-bimboh-primary rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-muted-foreground">Loading Telegram channels...</p>
         </div>
       )}
@@ -346,7 +346,7 @@ export default function TelegramChannelsHome() {
           {filteredChannels.slice(0, visibleChannels).map((channel) => (
             <Card
               key={channel.id}
-              className="bg-card/50 backdrop-blur-sm border-border/50 hover:border-iris-primary/50 transition-all duration-300 hover:scale-105 w-full min-w-0"
+              className="bg-card/50 backdrop-blur-sm border-border/50 hover:border-bimboh-primary/50 transition-all duration-300 hover:scale-105 w-full min-w-0"
             >
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between gap-2">
@@ -427,13 +427,13 @@ export default function TelegramChannelsHome() {
                   <Switch
                     checked={channel.enabled}
                     onCheckedChange={() => handleToggleChannel(channel)}
-                    className="data-[state=checked]:bg-iris-primary flex-shrink-0"
+                    className="data-[state=checked]:bg-bimboh-primary flex-shrink-0"
                   />
                   <Button
                     asChild
                     variant="outline"
                     size="sm"
-                    className="flex-1 border-iris-primary/30 text-iris-primary hover:bg-iris-primary/10 min-w-0"
+                    className="flex-1 border-bimboh-primary/30 text-bimboh-primary hover:bg-bimboh-primary/10 min-w-0"
                   >
                     <a href={`https://t.me/${channel.username}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-1">
                       <ExternalLink className="h-3 w-3 flex-shrink-0" />
@@ -453,7 +453,7 @@ export default function TelegramChannelsHome() {
           <Button 
             onClick={handleLoadMore}
             variant="outline" 
-            className="border-iris-primary/30 text-iris-primary hover:bg-iris-primary/10"
+            className="border-bimboh-primary/30 text-bimboh-primary hover:bg-bimboh-primary/10"
           >
             Load More Channels ({filteredChannels.length - visibleChannels} remaining)
           </Button>
@@ -463,8 +463,8 @@ export default function TelegramChannelsHome() {
       {/* Empty State */}
       {!loading && filteredChannels.length === 0 && !error && (
         <div className="text-center py-12">
-          <div className="w-16 h-16 bg-iris-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <MessageSquare className="h-8 w-8 text-iris-primary" />
+          <div className="w-16 h-16 bg-bimboh-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <MessageSquare className="h-8 w-8 text-bimboh-primary" />
           </div>
           <h3 className="text-lg font-semibold text-white mb-2 meme-comic">No Active Telegram Channels Found</h3>
           <p className="text-muted-foreground mb-4 meme-body">
@@ -479,7 +479,7 @@ export default function TelegramChannelsHome() {
           )}
           <Button
             onClick={fetchTelegramData}
-            className="mt-4 bg-iris-primary hover:bg-iris-primary/80 text-black"
+            className="mt-4 bg-bimboh-primary hover:bg-bimboh-primary/80 text-black"
           >
             Try Again
           </Button>

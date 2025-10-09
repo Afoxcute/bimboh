@@ -27,12 +27,12 @@ global.Headers = Headers;
 dotenv.config();
 
 /**
- * ADK-TS Workflow Orchestrator for Iris Memecoin Hunting Platform
+ * ADK-TS Workflow Orchestrator for Bimboh Memecoin Hunting Platform
  * 
  * This replaces the basic start_all_systems.mjs with intelligent multi-agent coordination
  * using ADK-TS framework for better error handling, retry logic, and observability.
  */
-class IrisWorkflowOrchestrator {
+class BimbohWorkflowOrchestrator {
   constructor() {
     this.supabase = createClient(
       process.env.SUPABASE_URL,
@@ -42,7 +42,7 @@ class IrisWorkflowOrchestrator {
     this.agents = {};
     this.workflow = null;
     this.isRunning = false;
-    this.sessionId = `iris_session_${Date.now()}`;
+    this.sessionId = `bimboh_session_${Date.now()}`;
     
     // Initialize decision agent
     this.decisionAgent = new RealtimeDecisionAgent(this.supabase);
@@ -1275,7 +1275,7 @@ class DataConsistencyTool { async execute() { return { success: true }; } }
 
 // Main execution
 async function main() {
-  const orchestrator = new IrisWorkflowOrchestrator();
+  const orchestrator = new BimbohWorkflowOrchestrator();
   
   try {
     // Start the complete workflow

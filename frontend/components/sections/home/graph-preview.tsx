@@ -16,7 +16,7 @@ export default function GraphPreview() {
         </div>
       </div>
       <div className="lg:flex-1 flex flex-col lg:pb-8 xl:pb-12 flex-1 max-w-full lg:max-w-[70%] mx-auto px-4 sm:px-6 lg:px-0">
-        <p className="font-bold nouns tracking-widest text-xl sm:text-2xl md:text-3xl lg:text-4xl text-iris-primary mt-8 sm:mt-12 lg:mt-16 xl:mt-24 text-center lg:text-right">
+        <p className="font-bold nouns tracking-widest text-xl sm:text-2xl md:text-3xl lg:text-4xl text-bimboh-primary mt-8 sm:mt-12 lg:mt-16 xl:mt-24 text-center lg:text-right">
           Track Viral Posts with <br className="hidden sm:block" />
           <span className="sm:hidden"> </span>Market Impact
         </p>

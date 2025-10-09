@@ -69,7 +69,7 @@ export default function Layout({
             height={40}
             className="rounded-full"
           />
-          <p className="font-bold text-lg sm:text-2xl crypto-futuristic tracking-widest text-iris-primary">
+          <p className="font-bold text-lg sm:text-2xl crypto-futuristic tracking-widest text-bimboh-primary">
             Bimboh
           </p>
         </div>
@@ -92,7 +92,7 @@ export default function Layout({
             variant="ghost"
             className="hidden lg:flex hover:bg-transparent hover:border-[1px] hover:border-white transform transition hover:scale-105"
             onClick={() => {
-              window.open("https://x.com/iris_internet", "_blank");
+              window.open("https://x.com/bimboh_app", "_blank");
             }}
           >
             <p className="sen text-sm sm:text-md font-bold">Follow on</p>
@@ -106,7 +106,7 @@ export default function Layout({
           </Button>
 
           <Button
-            className="bg-iris-primary hover:bg-iris-primary/80 transform transition hover:scale-105"
+            className="bg-bimboh-primary hover:bg-bimboh-primary/80 transform transition hover:scale-105"
             onClick={() => {
               if (!connected) setVisible(true);
               else disconnect();
@@ -139,7 +139,7 @@ export default function Layout({
           <p className="sen text-sm sm:text-md font-bold">
             Live Dashboard
           </p>
-          <div className="w-2 h-2 bg-iris-primary rounded-full animate-pulse ml-2"></div>
+          <div className="w-2 h-2 bg-bimboh-primary rounded-full animate-pulse ml-2"></div>
         </Button>
 
         <Button
@@ -156,7 +156,7 @@ export default function Layout({
           variant="ghost"
           className="hidden lg:flex hover:bg-transparent hover:border-[1px] hover:border-white transform transition hover:scale-105"
           onClick={() => {
-            window.open("https://x.com/iris_internet", "_blank");
+            window.open("https://x.com/bimboh_app", "_blank");
           }}
         >
           <p className="sen text-sm sm:text-md font-bold">Follow on</p>
@@ -170,7 +170,7 @@ export default function Layout({
         </Button>
 
         <Button
-          className="bg-iris-primary hover:bg-iris-primary/80 transform transition hover:scale-105"
+          className="bg-bimboh-primary hover:bg-bimboh-primary/80 transform transition hover:scale-105"
           onClick={() => {
             if (!connected) setVisible(true);
             else disconnect();

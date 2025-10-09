@@ -107,10 +107,10 @@ export default function ScraperStatus() {
 
   if (loading) {
     return (
-      <Card className="bg-black/20 border-iris-primary/20">
+      <Card className="bg-black/20 border-bimboh-primary/20">
         <CardContent className="p-6">
           <div className="flex items-center justify-center">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-iris-primary"></div>
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-bimboh-primary"></div>
             <span className="ml-2 text-muted-foreground">Checking status...</span>
           </div>
         </CardContent>
@@ -119,7 +119,7 @@ export default function ScraperStatus() {
   }
 
   return (
-    <Card className="bg-black/20 border-iris-primary/20">
+    <Card className="bg-black/20 border-bimboh-primary/20">
       <CardHeader className="pb-3 sm:pb-4">
         <CardTitle className="text-white flex items-center gap-2 text-base sm:text-lg">
           <Activity className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -178,11 +178,11 @@ export default function ScraperStatus() {
         {/* Statistics */}
         <div className="grid grid-cols-2 gap-3 sm:gap-4 pt-2">
           <div className="text-center p-2 sm:p-3 bg-black/10 rounded-lg">
-            <p className="text-lg sm:text-xl lg:text-2xl font-bold text-iris-primary">{status.totalVideos}</p>
+            <p className="text-lg sm:text-xl lg:text-2xl font-bold text-bimboh-primary">{status.totalVideos}</p>
             <p className="text-xs text-muted-foreground">Total Videos</p>
           </div>
           <div className="text-center p-2 sm:p-3 bg-black/10 rounded-lg">
-            <p className="text-lg sm:text-xl lg:text-2xl font-bold text-iris-primary">{status.videosToday}</p>
+            <p className="text-lg sm:text-xl lg:text-2xl font-bold text-bimboh-primary">{status.videosToday}</p>
             <p className="text-xs text-muted-foreground">Today</p>
           </div>
         </div>
@@ -192,7 +192,7 @@ export default function ScraperStatus() {
           <Button
             variant="outline"
             size="sm"
-            className="flex-1 border-iris-primary/30 text-iris-primary h-9 sm:h-10"
+            className="flex-1 border-bimboh-primary/30 text-bimboh-primary h-9 sm:h-10"
             onClick={fetchStatus}
           >
             <Activity className="h-4 w-4 mr-2" />
@@ -202,7 +202,7 @@ export default function ScraperStatus() {
           <Button
             variant="outline"
             size="sm"
-            className="flex-1 border-iris-primary/30 text-iris-primary h-9 sm:h-10"
+            className="flex-1 border-bimboh-primary/30 text-bimboh-primary h-9 sm:h-10"
             onClick={() => window.open('/dashboard', '_blank')}
           >
             <Play className="h-4 w-4 mr-2" />

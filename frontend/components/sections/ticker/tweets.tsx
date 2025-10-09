@@ -101,7 +101,7 @@ export default function Tweets({
     <>
       <div className="flex justify-between sen my-12 items-center">
         <div className="flex flex-col w-full">
-          <p className="text-xl md:text-2xl text-center mx-auto md:mx-0 md:text-start font-bold nouns tracking-widest text-iris-primary">
+          <p className="text-xl md:text-2xl text-center mx-auto md:mx-0 md:text-start font-bold nouns tracking-widest text-bimboh-primary">
             Bimboh Tweets
           </p>
           <p className="text-xs md:text-sm text-center mx-auto md:mx-0 md:text-start lg:text-md text-muted-foreground font-semibold">
@@ -127,11 +127,11 @@ export default function Tweets({
             {tweets.map((tweet, index) => (
               <Card
                 key={index}
-                className="rounded-lg mt-2 mb-4 transform transition-all duration-300 hover:scale-105 hover:border hover:border-[1px] hover:border-iris-primary cursor-pointer"
+                className="rounded-lg mt-2 mb-4 transform transition-all duration-300 hover:scale-105 hover:border hover:border-[1px] hover:border-bimboh-primary cursor-pointer"
                 onClick={() => {
                   console.log("tweet", tweet);
                   window.open(
-                    "https://x.com/iris_internet/status/1867331863993627085",
+                    "https://x.com/bimboh_app/status/1867331863993627085",
                     "_blank"
                   );
                 }}
@@ -150,7 +150,7 @@ export default function Tweets({
                         Bimboh
                       </p>
                       <p className="text-xs font-medium text-muted-foreground">
-                        @iris_internet
+                        @bimboh_app
                       </p>
                     </div>
                     <div className="flex-1 flex justify-end">
