@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { EnvironmentStoreProvider } from '@/components/context';
 import SolanaWalletProvider from './wallet-provider';
+import { ThemeProvider } from './theme-provider';
 import Layout from '@/components/sections/layout';
 import { Toaster } from '@/components/ui/toaster';
 
@@ -32,11 +33,18 @@ export default function SSRSafeProvider({ children }: { children: React.ReactNod
   }
 
   return (
-    <EnvironmentStoreProvider>
-      <SolanaWalletProvider>
-        <Layout>{children}</Layout>
-        <Toaster />
-      </SolanaWalletProvider>
-    </EnvironmentStoreProvider>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="dark"
+      enableSystem={false}
+      disableTransitionOnChange
+    >
+      <EnvironmentStoreProvider>
+        <SolanaWalletProvider>
+          <Layout>{children}</Layout>
+          <Toaster />
+        </SolanaWalletProvider>
+      </EnvironmentStoreProvider>
+    </ThemeProvider>
   );
 }

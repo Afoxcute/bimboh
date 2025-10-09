@@ -32,7 +32,7 @@ export default function TelegramChannelsHome() {
   const [refreshing, setRefreshing] = useState(false);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [isClient, setIsClient] = useState(false);
-  const [visibleChannels, setVisibleChannels] = useState(12);
+  const [visibleChannels, setVisibleChannels] = useState(6);
   const [connectionStatus, setConnectionStatus] = useState({
     isConnected: false,
     isConnecting: false,
@@ -155,12 +155,22 @@ export default function TelegramChannelsHome() {
                          (statusFilter === 'enabled' && channel.enabled) ||
                          (statusFilter === 'disabled' && !channel.enabled);
     
-    return matchesSearch && matchesStatus;
+    const hasMessages = channel.stats.totalMessages > 0;
+    
+    return matchesSearch && matchesStatus && hasMessages;
   }) || [];
+
+  // Debug logging
+  console.log('Telegram Channels Debug:', {
+    totalChannels: data?.channels.length || 0,
+    filteredChannels: filteredChannels.length,
+    visibleChannels,
+    showLoadMore: filteredChannels.length > visibleChannels
+  });
 
   // Reset visible channels when filters change
   useEffect(() => {
-    setVisibleChannels(12);
+    setVisibleChannels(6);
   }, [searchTerm, statusFilter]);
 
   const formatLastMessage = (lastMessageAt: string | null) => {
@@ -456,9 +466,9 @@ export default function TelegramChannelsHome() {
           <div className="w-16 h-16 bg-iris-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <MessageSquare className="h-8 w-8 text-iris-primary" />
           </div>
-          <h3 className="text-lg font-semibold text-white mb-2 meme-comic">No Telegram Channels Found</h3>
+          <h3 className="text-lg font-semibold text-white mb-2 meme-comic">No Active Telegram Channels Found</h3>
           <p className="text-muted-foreground mb-4 meme-body">
-            {searchTerm ? 'Try adjusting your search terms' : 'Start adding Telegram channels to monitor memecoin activity!'}
+            {searchTerm ? 'Try adjusting your search terms' : 'Only channels with messages are shown. Add channels and wait for data collection!'}
           </p>
           {!searchTerm && (
             <div className="space-y-2 text-sm text-muted-foreground">

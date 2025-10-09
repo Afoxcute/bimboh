@@ -26,7 +26,10 @@ export default function Tiktoks({
           </p>
           <div className="relative flex justify-center">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 ">
-              {tiktoks.slice(0, paid ? tiktoks.length : 4).map((video, i) => {
+              {tiktoks
+                .filter(video => (video.tiktoks.views > 0 || video.tiktoks.comments > 0))
+                .slice(0, paid ? tiktoks.length : 4)
+                .map((video, i) => {
                 return (
                   <div
                     onClick={() => window.open(video.tiktoks.url, "_blank")}

@@ -146,7 +146,9 @@ export default function TelegramChannels({ className }: TelegramChannelsProps) {
                          (statusFilter === 'enabled' && channel.enabled) ||
                          (statusFilter === 'disabled' && !channel.enabled);
     
-    return matchesSearch && matchesStatus;
+    const hasMessages = channel.stats.totalMessages > 0;
+    
+    return matchesSearch && matchesStatus && hasMessages;
   }) || [];
 
   const formatLastMessage = (lastMessageAt: string | null) => {
@@ -304,9 +306,11 @@ export default function TelegramChannels({ className }: TelegramChannelsProps) {
           {filteredChannels.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <MessageSquare className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>No channels found</p>
-              {searchTerm && (
+              <p>No active channels found</p>
+              {searchTerm ? (
                 <p className="text-sm">Try adjusting your search terms</p>
+              ) : (
+                <p className="text-sm">Only channels with messages are shown</p>
               )}
             </div>
           ) : (

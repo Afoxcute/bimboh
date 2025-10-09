@@ -36,6 +36,7 @@ export default function RealTimeTikTokFeed() {
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [isClient, setIsClient] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [visibleVideos, setVisibleVideos] = useState(12);
 
   const fetchTikTokData = async () => {
     try {
@@ -126,6 +127,20 @@ export default function RealTimeTikTokFeed() {
     return mentions.filter(mention => mention.tiktok_id === tiktokId);
   };
 
+  // Filter out TikTok videos with 0 views and 0 comments
+  const filteredTiktoks = tiktoks.filter(tiktok => 
+    (tiktok.views > 0 || tiktok.comments > 0)
+  );
+
+  const handleLoadMore = () => {
+    setVisibleVideos(prev => prev + 12);
+  };
+
+  // Reset visible videos when filtered data changes
+  useEffect(() => {
+    setVisibleVideos(12);
+  }, [filteredTiktoks.length]);
+
   // Don't render until client-side
   if (!isClient) {
     return (
@@ -196,9 +211,9 @@ export default function RealTimeTikTokFeed() {
       )}
 
       {/* TikTok Videos Grid */}
-      {!loading && tiktoks.length > 0 && (
+      {!loading && filteredTiktoks.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {tiktoks.slice(0, 12).map((tiktok) => {
+        {filteredTiktoks.slice(0, visibleVideos).map((tiktok) => {
           const tiktokMentions = getTokenMentions(tiktok.id);
           
           return (
@@ -290,23 +305,27 @@ export default function RealTimeTikTokFeed() {
       )}
 
       {/* Load More */}
-      {!loading && tiktoks.length > 12 && (
+      {!loading && filteredTiktoks.length > visibleVideos && (
         <div className="text-center mt-8">
-          <Button variant="outline" className="border-iris-primary/30 text-iris-primary">
-            Load More Videos
+          <Button 
+            onClick={handleLoadMore}
+            variant="outline" 
+            className="border-iris-primary/30 text-iris-primary hover:bg-iris-primary/10"
+          >
+            Load More Videos ({filteredTiktoks.length - visibleVideos} remaining)
           </Button>
         </div>
       )}
 
       {/* Empty State */}
-      {!loading && tiktoks.length === 0 && !error && (
+      {!loading && filteredTiktoks.length === 0 && !error && (
         <div className="text-center py-12">
           <div className="w-16 h-16 bg-iris-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <TrendingUp className="h-8 w-8 text-iris-primary" />
           </div>
-          <h3 className="text-lg font-semibold text-white mb-2 meme-comic">No TikTok Data Yet</h3>
+          <h3 className="text-lg font-semibold text-white mb-2 meme-comic">No Active TikTok Videos Found</h3>
           <p className="text-muted-foreground mb-4 meme-body">
-            Start your automated scraping to see real-time memecoin mentions here!
+            Only videos with views or comments are shown. Start scraping to collect engagement data!
           </p>
           <div className="space-y-2 text-sm text-muted-foreground">
             <p>• Check if your scraper is running</p>
