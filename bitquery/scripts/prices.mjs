@@ -247,4 +247,4 @@ export async function fetchAndPushPrices() {
   }
 }
 
-// fetchAndPushPrices();
+fetchAndPushPrices();

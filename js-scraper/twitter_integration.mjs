@@ -26,8 +26,8 @@ class TwitterIntegration {
       apiKey: process.env.OPENAI_API_KEY,
     });
     
-    this.volumeThreshold = 10000; // $10K threshold
-    this.growthThreshold = 100; // 100% growth threshold
+    this.volumeThreshold = 1000; // $1K threshold (lowered for testing)
+    this.growthThreshold = 50; // 50% growth threshold (lowered for testing)
     this.postedAlerts = new Set(); // Track posted alerts to avoid duplicates
     
     // Initialize scheduled tasks
@@ -68,8 +68,8 @@ class TwitterIntegration {
     try {
       console.log('📊 Monitoring volume growth...');
       
-      // Get recent price data from last hour
-      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+      // Get recent price data from last 3 hours to compare 24h volumes
+      const threeHoursAgo = new Date(Date.now() - 3 * 60 * 60 * 1000);
       
       const { data: recentPrices, error } = await this.supabase
         .from('prices')
@@ -81,7 +81,7 @@ class TwitterIntegration {
             uri
           )
         `)
-        .gte('trade_at', oneHourAgo.toISOString())
+        .gte('trade_at', threeHoursAgo.toISOString())
         .order('trade_at', { ascending: false });
 
       if (error) throw error;
@@ -89,6 +89,19 @@ class TwitterIntegration {
       if (!recentPrices || recentPrices.length === 0) {
         console.log('No recent price data found');
         return;
+      }
+
+      console.log(`📊 Found ${recentPrices.length} recent price records`);
+      // Debug: Show sample data
+      if (recentPrices.length > 0) {
+        const sample = recentPrices[0];
+        console.log('📊 Sample price record:', {
+          tokenUri: sample.tokens?.uri,
+          symbol: sample.tokens?.symbol,
+          volume_24h: sample.volume_24h,
+          price_sol: sample.price_sol,
+          trade_at: sample.trade_at
+        });
       }
 
       // Group prices by token
@@ -129,32 +142,37 @@ class TwitterIntegration {
     try {
       if (prices.length < 2) return; // Need at least 2 data points
       
-      // Sort by timestamp
-      prices.sort((a, b) => new Date(a.trade_at) - new Date(b.trade_at));
+      // Sort by timestamp (newest first)
+      prices.sort((a, b) => new Date(b.trade_at) - new Date(a.trade_at));
       
-      // Calculate hourly volume growth
-      const hourlyVolumes = this.calculateHourlyVolumes(prices);
+      // Get the latest 24h volume (most recent)
+      const currentVolume = parseFloat(prices[0].volume_24h || 0);
       
-      if (hourlyVolumes.length < 2) return;
+      // Get 24h volume from 2 hours ago (if available)
+      const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
+      const olderPrices = prices.filter(p => new Date(p.trade_at) <= twoHoursAgo);
       
-      // Calculate volume growth rate
-      const currentHour = hourlyVolumes[hourlyVolumes.length - 1];
-      const previousHour = hourlyVolumes[hourlyVolumes.length - 2];
+      if (olderPrices.length === 0) return; // Need older data for comparison
       
-      const volumeGrowth = currentHour.volume - previousHour.volume;
-      const growthRate = previousHour.volume > 0 ? 
-        ((currentHour.volume - previousHour.volume) / previousHour.volume) * 100 : 0;
+      const previousVolume = parseFloat(olderPrices[0].volume_24h || 0);
+      
+      // Calculate volume growth
+      const volumeGrowth = currentVolume - previousVolume;
+      const growthRate = previousVolume > 0 ? 
+        ((currentVolume - previousVolume) / previousVolume) * 100 : 0;
+      
+      console.log(`📊 ${tokenUri}: Current: $${currentVolume.toFixed(2)}, Previous: $${previousVolume.toFixed(2)}, Growth: $${volumeGrowth.toFixed(2)} (${growthRate.toFixed(1)}%)`);
       
       // Check if thresholds are met
-      const alertKey = `${tokenUri}_volume_${currentHour.timestamp}`;
+      const alertKey = `${tokenUri}_volume_${Date.now()}`;
       
       if (volumeGrowth >= this.volumeThreshold && !this.postedAlerts.has(alertKey)) {
-        await this.postVolumeGrowthAlert(tokenUri, volumeGrowth, currentHour.volume, previousHour.volume);
+        await this.postVolumeGrowthAlert(tokenUri, volumeGrowth, currentVolume, previousVolume);
         this.postedAlerts.add(alertKey);
       }
       
       if (growthRate >= this.growthThreshold && !this.postedAlerts.has(alertKey)) {
-        await this.postGrowthRateAlert(tokenUri, growthRate, currentHour.volume, previousHour.volume);
+        await this.postGrowthRateAlert(tokenUri, growthRate, currentVolume, previousVolume);
         this.postedAlerts.add(alertKey);
       }
       
@@ -163,30 +181,6 @@ class TwitterIntegration {
     }
   }
 
-  /**
-   * Calculate hourly volumes from price data
-   */
-  calculateHourlyVolumes(prices) {
-    const hourlyData = {};
-    
-    prices.forEach(price => {
-      const hour = new Date(price.trade_at).toISOString().slice(0, 13) + ':00:00Z';
-      
-      if (!hourlyData[hour]) {
-        hourlyData[hour] = {
-          timestamp: hour,
-          volume: 0,
-          count: 0
-        };
-      }
-      
-      // Add volume (assuming price_sol represents volume in SOL)
-      hourlyData[hour].volume += parseFloat(price.price_sol || 0);
-      hourlyData[hour].count++;
-    });
-    
-    return Object.values(hourlyData).sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-  }
 
   /**
    * Post volume growth alert

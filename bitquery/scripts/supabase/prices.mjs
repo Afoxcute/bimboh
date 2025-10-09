@@ -37,27 +37,68 @@ export async function pushPrices(filePath, dataJson) {
     const batchSize = 100;
     const priceDataArray = [];
 
+    // Group trades by token URI to calculate volume
+    const tradesByUri = {};
+    
     for (const priceData of tokens.data.Solana.DEXTrades) {
       if (!priceData.Trade?.Buy?.Currency?.Uri) {
         console.warn("Skipping record with missing URI");
         continue;
       }
 
+      const uri = priceData.Trade.Buy.Currency.Uri;
+      if (!tradesByUri[uri]) {
+        tradesByUri[uri] = {
+          trades: [],
+          totalVolumeUSD: 0,
+          latestPrice: priceData.Trade.Buy.Price,
+          latestPriceUSD: priceData.Trade.Buy.PriceInUSD,
+          latestTime: priceData.Block.Time,
+          mint_address: priceData.Trade.Buy.Currency.MintAddress,
+          name: priceData.Trade.Buy.Currency.Name,
+          symbol: priceData.Trade.Buy.Currency.Symbol
+        };
+      }
+      
+      // Add trade to the group
+      tradesByUri[uri].trades.push(priceData);
+      
+      // Calculate volume (assuming PriceInUSD represents the trade value)
+      const tradeValue = parseFloat(priceData.Trade.Buy.PriceInUSD || 0);
+      tradesByUri[uri].totalVolumeUSD += tradeValue;
+      
+      // Keep track of the latest price and time
+      if (new Date(priceData.Block.Time) > new Date(tradesByUri[uri].latestTime)) {
+        tradesByUri[uri].latestPrice = priceData.Trade.Buy.Price;
+        tradesByUri[uri].latestPriceUSD = priceData.Trade.Buy.PriceInUSD;
+        tradesByUri[uri].latestTime = priceData.Block.Time;
+      }
+    }
+
+    // Convert grouped data to price data array
+    for (const [uri, tokenData] of Object.entries(tradesByUri)) {
       priceDataArray.push({
-        price_sol: priceData.Trade.Buy.Price,
-        price_usd: priceData.Trade.Buy.PriceInUSD,
-        created_at: sanitize(priceData.Block.Time),
-        uri: priceData.Trade.Buy.Currency.Uri,
-        mint_address: priceData.Trade.Buy.Currency.MintAddress,
-        name: priceData.Trade.Buy.Currency.Name,
-        symbol: priceData.Trade.Buy.Currency.Symbol,
-        block_time: priceData.Block.Time
+        price_sol: tokenData.latestPrice,
+        price_usd: tokenData.latestPriceUSD,
+        created_at: sanitize(tokenData.latestTime),
+        uri: uri,
+        mint_address: tokenData.mint_address,
+        name: tokenData.name,
+        symbol: tokenData.symbol,
+        block_time: tokenData.latestTime,
+        volume_24h: tokenData.totalVolumeUSD, // Add calculated volume
+        trade_count: tokenData.trades.length // Add trade count for debugging
       });
     }
 
     console.log(
       `Processing ${priceDataArray.length} records in batches of ${batchSize}...`
     );
+    
+    // Debug: Show volume calculations
+    priceDataArray.forEach((item, index) => {
+      console.log(`📊 Token ${index + 1}: ${item.symbol} - Volume: $${item.volume_24h?.toFixed(2) || 0} (${item.trade_count || 0} trades)`);
+    });
 
     // Process in batche
 
@@ -92,6 +133,7 @@ export async function pushPrices(filePath, dataJson) {
             trade_at: item.created_at,
             timestamp: item.block_time,
             is_latest: true,
+            volume_24h: item.volume_24h || 0, // Add volume_24h field
           });
         } else {
           missingUris.push(item.uri);
