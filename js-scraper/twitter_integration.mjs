@@ -322,23 +322,21 @@ class TwitterIntegration {
    */
   async generateVolumeGrowthMessage(token, volumeGrowth, currentVolume, previousVolume) {
     try {
-      const volumeGrowthFormatted = this.formatCurrency(volumeGrowth);
-      const currentVolumeFormatted = this.formatCurrency(currentVolume);
-      const previousVolumeFormatted = this.formatCurrency(previousVolume);
+      const growthRate = previousVolume > 0 ? ((currentVolume - previousVolume) / previousVolume) * 100 : 0;
       
-      const prompt = `Generate an engaging tweet about a memecoin volume surge. 
+      const prompt = `Generate an engaging tweet about a memecoin showing strong momentum. 
 
 Context:
 - Token: ${token.symbol} (${token.name})
-- Volume growth: +${volumeGrowthFormatted}/hour
-- Current volume: ${currentVolumeFormatted}
-- Previous volume: ${previousVolumeFormatted}
+- Growth momentum: ${growthRate > 0 ? 'Rising' : 'Building'}
+- Market activity: ${growthRate > 100 ? 'Explosive' : growthRate > 50 ? 'Strong' : 'Growing'}
 
 Requirements:
 - Maximum 280 characters
 - Include emojis and hashtags
 - Make it exciting and engaging
-- Include the key metrics
+- Don't mention specific volume numbers or dollar amounts
+- Focus on momentum, potential, and excitement
 - Use relevant crypto hashtags
 - Keep it professional but fun
 
@@ -347,7 +345,7 @@ Format the response as a complete tweet ready to post.`;
       const completion = await this.openai.chat.completions.create({
         model: "gpt-3.5-turbo",
         messages: [
-          { role: "system", content: "You are a crypto analyst creating engaging tweets about memecoin volume surges. Be exciting, informative, and use relevant hashtags." },
+          { role: "system", content: "You are a crypto analyst creating engaging tweets about memecoin momentum. Be exciting, informative, and use relevant hashtags. Never mention specific dollar amounts or volume numbers." },
           { role: "user", content: prompt }
         ],
         max_tokens: 200,
@@ -366,16 +364,14 @@ Format the response as a complete tweet ready to post.`;
    * Format volume growth message (fallback)
    */
   formatVolumeGrowthMessage(token, volumeGrowth, currentVolume, previousVolume) {
-    const volumeGrowthFormatted = this.formatCurrency(volumeGrowth);
-    const currentVolumeFormatted = this.formatCurrency(currentVolume);
+    const growthRate = previousVolume > 0 ? ((currentVolume - previousVolume) / previousVolume) * 100 : 0;
     
-    return `🚀 VOLUME ALERT! 🚀\n\n` +
+    return `🚀 MOMENTUM ALERT! 🚀\n\n` +
            `${token.symbol} (${token.name})\n` +
-           `Volume growth: +${volumeGrowthFormatted}/hour\n` +
-           `Current: ${currentVolumeFormatted}\n` +
-           `Previous: ${this.formatCurrency(previousVolume)}\n\n` +
+           `Growth: ${growthRate > 0 ? '+' : ''}${growthRate.toFixed(1)}%\n` +
+           `Status: ${growthRate > 100 ? 'Explosive' : growthRate > 50 ? 'Strong' : 'Growing'}\n\n` +
            `#${token.symbol} #Memecoin #Solana #PumpFun\n` +
-           `#VolumeAlert #Trading`;
+           `#MomentumAlert #Trading`;
   }
 
   /**
@@ -383,21 +379,19 @@ Format the response as a complete tweet ready to post.`;
    */
   async generateGrowthRateMessage(token, growthRate, currentVolume, previousVolume) {
     try {
-      const currentVolumeFormatted = this.formatCurrency(currentVolume);
-      const previousVolumeFormatted = this.formatCurrency(previousVolume);
-      
-      const prompt = `Generate an engaging tweet about a memecoin growth rate surge. 
+      const prompt = `Generate an engaging tweet about a memecoin showing strong growth. 
 
 Context:
 - Token: ${token.symbol} (${token.name})
 - Growth rate: +${growthRate.toFixed(1)}%
-- Volume change: ${previousVolumeFormatted} → ${currentVolumeFormatted}
+- Market momentum: ${growthRate > 100 ? 'Explosive' : growthRate > 50 ? 'Strong' : 'Growing'}
 
 Requirements:
 - Maximum 280 characters
 - Include emojis and hashtags
 - Make it exciting and engaging
-- Emphasize the growth percentage
+- Don't mention specific volume numbers or dollar amounts
+- Focus on growth percentage and momentum
 - Use relevant crypto hashtags
 - Keep it professional but fun
 
@@ -406,7 +400,7 @@ Format the response as a complete tweet ready to post.`;
       const completion = await this.openai.chat.completions.create({
         model: "gpt-3.5-turbo",
         messages: [
-          { role: "system", content: "You are a crypto analyst creating engaging tweets about memecoin growth rate surges. Be exciting, informative, and use relevant hashtags." },
+          { role: "system", content: "You are a crypto analyst creating engaging tweets about memecoin growth. Be exciting, informative, and use relevant hashtags. Never mention specific dollar amounts or volume numbers." },
           { role: "user", content: prompt }
         ],
         max_tokens: 200,
@@ -425,13 +419,10 @@ Format the response as a complete tweet ready to post.`;
    * Format growth rate message (fallback)
    */
   formatGrowthRateMessage(token, growthRate, currentVolume, previousVolume) {
-    const currentVolumeFormatted = this.formatCurrency(currentVolume);
-    const previousVolumeFormatted = this.formatCurrency(previousVolume);
-    
     return `📈 GROWTH ALERT! 📈\n\n` +
            `${token.symbol} (${token.name})\n` +
-           `Growth rate: +${growthRate.toFixed(1)}%\n` +
-           `Volume: ${previousVolumeFormatted} → ${currentVolumeFormatted}\n\n` +
+           `Growth: +${growthRate.toFixed(1)}%\n` +
+           `Status: ${growthRate > 100 ? 'Explosive' : growthRate > 50 ? 'Strong' : 'Growing'}\n\n` +
            `#${token.symbol} #Memecoin #Solana #PumpFun\n` +
            `#GrowthAlert #Trading`;
   }
@@ -466,7 +457,7 @@ Format the response as a complete tweet ready to post.`;
       const completion = await this.openai.chat.completions.create({
         model: "gpt-3.5-turbo",
         messages: [
-          { role: "system", content: "You are a crypto analyst creating engaging tweets about trending memecoin discoveries. Be exciting, informative, and use relevant hashtags." },
+          { role: "system", content: "You are a crypto analyst creating engaging tweets about trending memecoin discoveries. Be exciting, informative, and use relevant hashtags. Never mention specific dollar amounts or volume numbers." },
           { role: "user", content: prompt }
         ],
         max_tokens: 200,
@@ -623,7 +614,7 @@ Format the response as a complete tweet ready to post.`;
 
 Context:
 - Total tokens traded: ${marketData.totalTokens}
-- Average volume change: ${marketData.avgVolumeChange}%
+- Market activity: ${marketData.avgVolumeChange > 50 ? 'High' : marketData.avgVolumeChange > 0 ? 'Moderate' : 'Low'}
 - Top performing token: ${marketData.topPerformer}
 - Market mood: ${marketData.marketMood}
 
@@ -631,7 +622,8 @@ Requirements:
 - Maximum 280 characters
 - Include emojis and hashtags
 - Make it engaging and informative
-- Provide market insights
+- Don't mention specific volume numbers or dollar amounts
+- Focus on market sentiment and trends
 - Use relevant crypto hashtags
 - Keep it professional but exciting
 
@@ -640,7 +632,7 @@ Format the response as a complete tweet ready to post.`;
       const completion = await this.openai.chat.completions.create({
         model: "gpt-3.5-turbo",
         messages: [
-          { role: "system", content: "You are a crypto analyst creating engaging tweets about memecoin market sentiment. Be insightful, exciting, and use relevant hashtags." },
+          { role: "system", content: "You are a crypto analyst creating engaging tweets about memecoin market sentiment. Be insightful, exciting, and use relevant hashtags. Never mention specific dollar amounts or volume numbers." },
           { role: "user", content: prompt }
         ],
         max_tokens: 200,
