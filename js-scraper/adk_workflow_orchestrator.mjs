@@ -1316,4 +1316,4 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   main();
 }
 
-export { IrisWorkflowOrchestrator };
+export { BimbohWorkflowOrchestrator };
