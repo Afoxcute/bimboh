@@ -345,7 +345,7 @@ Requirements:
 Format the response as a complete tweet ready to post.`;
 
       const completion = await this.openai.chat.completions.create({
-        model: "gpt-4",
+        model: "gpt-3.5-turbo",
         messages: [
           { role: "system", content: "You are a crypto analyst creating engaging tweets about memecoin volume surges. Be exciting, informative, and use relevant hashtags." },
           { role: "user", content: prompt }
@@ -404,7 +404,7 @@ Requirements:
 Format the response as a complete tweet ready to post.`;
 
       const completion = await this.openai.chat.completions.create({
-        model: "gpt-4",
+        model: "gpt-3.5-turbo",
         messages: [
           { role: "system", content: "You are a crypto analyst creating engaging tweets about memecoin growth rate surges. Be exciting, informative, and use relevant hashtags." },
           { role: "user", content: prompt }
@@ -464,7 +464,7 @@ Requirements:
 Format the response as a complete tweet ready to post.`;
 
       const completion = await this.openai.chat.completions.create({
-        model: "gpt-4",
+        model: "gpt-3.5-turbo",
         messages: [
           { role: "system", content: "You are a crypto analyst creating engaging tweets about trending memecoin discoveries. Be exciting, informative, and use relevant hashtags." },
           { role: "user", content: prompt }
@@ -555,10 +555,9 @@ Format the response as a complete tweet ready to post.`;
           alert_generated_at: new Date().toISOString(),
           alert_version: '1.0.0'
         },
-        posted_at: new Date().toISOString(),
         tweet_id: tweetId,
         status: tweetId ? 'posted' : 'generated',
-        created_at: new Date().toISOString()
+        posted_at: new Date().toISOString()
       };
 
       const { data: storedAlert, error } = await this.supabase
@@ -639,7 +638,7 @@ Requirements:
 Format the response as a complete tweet ready to post.`;
 
       const completion = await this.openai.chat.completions.create({
-        model: "gpt-4",
+        model: "gpt-3.5-turbo",
         messages: [
           { role: "system", content: "You are a crypto analyst creating engaging tweets about memecoin market sentiment. Be insightful, exciting, and use relevant hashtags." },
           { role: "user", content: prompt }

@@ -37,7 +37,7 @@ async function testAITweetGeneration() {
     try {
       const testPrompt = "Generate a simple test tweet about crypto in 50 characters or less.";
       const completion = await twitter.openai.chat.completions.create({
-        model: "gpt-4",
+        model: "gpt-3.5-turbo",
         messages: [
           { role: "system", content: "You are a helpful assistant." },
           { role: "user", content: testPrompt }

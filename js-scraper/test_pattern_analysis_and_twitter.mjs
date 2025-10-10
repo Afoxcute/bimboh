@@ -177,7 +177,7 @@ async function testPatternAnalysisAndTwitter() {
       const { data: twitterAlerts, error: twitterError } = await twitterIntegration.supabase
         .from('twitter_alerts')
         .select('*')
-        .order('created_at', { ascending: false })
+        .order('posted_at', { ascending: false })
         .limit(5);
       
       if (twitterError) {
