@@ -284,7 +284,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Documentation**: Check the `/docs` folder for detailed guides
 - **Issues**: Report bugs and feature requests via GitHub Issues
 - **Discord**: Join our community for discussions
-- **Twitter**: Follow [@bimboh_app](https://x.com/bimboh_app) for updates
+- **Twitter**: Follow [@bimboh_internet](https://x.com/bimboh_internet) for updates
 
 ---
 

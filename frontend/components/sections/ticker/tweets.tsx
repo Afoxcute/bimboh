@@ -131,7 +131,7 @@ export default function Tweets({
                 onClick={() => {
                   console.log("tweet", tweet);
                   window.open(
-                    "https://x.com/bimboh_app/status/1867331863993627085",
+                    "https://x.com/bimboh_internet/status/1867331863993627085",
                     "_blank"
                   );
                 }}
@@ -150,7 +150,7 @@ export default function Tweets({
                         Bimboh
                       </p>
                       <p className="text-xs font-medium text-muted-foreground">
-                        @bimboh_app
+                        @bimboh_internet
                       </p>
                     </div>
                     <div className="flex-1 flex justify-end">

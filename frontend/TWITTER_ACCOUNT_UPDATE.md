@@ -2,7 +2,7 @@
 
 ## 🎯 **Update Summary**
 
-Successfully updated all Twitter/X account references from the old `@TokenHunterZoro` account to the new `@bimboh_app` account across the entire Bimboh application.
+Successfully updated all Twitter/X account references from the old `@TokenHunterZoro` account to the new `@bimboh_internet` account across the entire Bimboh application.
 
 ## ✅ **Files Updated**
 
@@ -18,7 +18,7 @@ onClick={() => {
 
 // After:
 onClick={() => {
-  window.open("https://x.com/bimboh_app", "_blank");
+  window.open("https://x.com/bimboh_internet", "_blank");
 }}
 ```
 
@@ -37,7 +37,7 @@ window.open(
 
 // After:
 window.open(
-  "https://x.com/bimboh_app/status/1867331863993627085",
+  "https://x.com/bimboh_internet/status/1867331863993627085",
   "_blank"
 );
 ```

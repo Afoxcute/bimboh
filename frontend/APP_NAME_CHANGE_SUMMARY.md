@@ -36,7 +36,7 @@ The app name has been successfully changed from "Iris" to "Bimboh" throughout th
 
 - **CSS Classes**: The `bimboh-primary`, `bimboh-secondary` etc. CSS classes are now used for styling
 - **Image Files**: The `/bomboh.png` image file path is now used
-- **Twitter Handle**: The `@bimboh_app` Twitter handle is now used
+- **Twitter Handle**: The `@bimboh_internet` Twitter handle is now used
 - **Data Files**: The `all-memecoins.json` file contains token data and remains unchanged
 
 ### **Visual Changes:**

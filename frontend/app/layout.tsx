@@ -53,7 +53,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "player",
-    site: "https://x.com/bimboh_app",
+    site: "https://x.com/bimboh_internet",
     title: "Bimboh | World's Best Memecoin Hunter",
     images: ["/bomboh.png"],
     description:
